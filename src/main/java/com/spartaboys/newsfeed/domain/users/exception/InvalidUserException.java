@@ -8,4 +8,8 @@ public class InvalidUserException extends GlobalException {
     public InvalidUserException(ErrorCode errorCode) {
         super(errorCode);
     }
+
+//    public String getCode() {
+//        return getErrorCode().toString();
+//    }
 }
