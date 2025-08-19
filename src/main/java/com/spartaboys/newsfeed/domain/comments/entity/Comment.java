@@ -2,6 +2,8 @@ package com.spartaboys.newsfeed.domain.comments.entity;
 
 import com.spartaboys.newsfeed.common.entity.BaseEntity;
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
+import com.spartaboys.newsfeed.domain.comments.exception.InvalidCommentException;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,7 +30,11 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    private Long likes = 0L;
+    private int likes = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
     @Builder
     public Comment(String content, Board board, User user) {
@@ -39,5 +45,17 @@ public class Comment extends BaseEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void validNotDeleteComment() {
+        if (isDeleted()) {
+            throw new InvalidCommentException(CommentErrorCode.COMMENT_NOT_FOUND);
+        }
+    }
+
+    public void validNotDeleteBoard() {
+        if (board.isDeleted()) {
+            throw new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND);
+        }
     }
 }
