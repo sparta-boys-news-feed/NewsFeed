@@ -22,16 +22,17 @@ public class CommentMapper {
 
     // Comment 엔티티를 DTO로 변환
     public CommentResponse toDto(Comment comment) {
-        return new CommentResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getUser().getNickname(),
-                comment.getCreatedAt(),
-                comment.getUpdatedAt()
-        );
+        return CommentResponse.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .nickname(comment.getUser().getNickname())
+                .likes(comment.getLikes())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .build();
     }
 
-    // 댓글 페이징 각 댓글을 DTO로 변환
+    // 댓글 페이징 Comment을 DTO로 변환
     public Page<CommentResponse> toDto(Page<Comment> comments) {
         return comments.map(this::toDto);
     }
