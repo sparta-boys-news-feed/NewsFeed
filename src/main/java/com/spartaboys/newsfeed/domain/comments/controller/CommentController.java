@@ -10,6 +10,8 @@ import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +25,11 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<ApiResponse<CommentResponse>> createComment(
             @PathVariable Long boardId,
-            @SessionAttribute("user") User user,
+            @SessionAttribute("user") User loginUser,
             @Valid @RequestBody CommentCreateRequest commentRequest
     ) {
 
-        CommentResponse response = commentService.createComment(boardId, user, commentRequest);
+        CommentResponse response = commentService.createComment(boardId, loginUser, commentRequest);
 
         return ApiResponse.created(response);
     }
@@ -38,8 +40,10 @@ public class CommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
+        // 페이지 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
 
-        Page<CommentResponse> response = commentService.findAllByBoardId(boardId, page, size);
+        Page<CommentResponse> response = commentService.getAllByBoardId(boardId, pageable);
 
         return ApiPageResponse.success(response);
     }
@@ -50,7 +54,7 @@ public class CommentController {
             @PathVariable Long commentId
     ) {
 
-        CommentResponse response = commentService.findComment(boardId, commentId);
+        CommentResponse response = commentService.getComment(boardId, commentId);
 
         return ApiResponse.success(response);
     }
@@ -59,11 +63,11 @@ public class CommentController {
     public ResponseEntity<ApiResponse<CommentResponse>> updateComment(
             @PathVariable Long boardId,
             @PathVariable Long commentId,
-            @SessionAttribute("user") User user,
+            @SessionAttribute("user") User loginUser,
             @Valid @RequestBody CommentUpdateRequest commentRequest
     ) {
 
-        CommentResponse response = commentService.updateComment(boardId, commentId, user, commentRequest);
+        CommentResponse response = commentService.updateComment(boardId, commentId, loginUser, commentRequest);
 
         return ApiResponse.success(response);
     }
@@ -72,8 +76,8 @@ public class CommentController {
     public void deleteComment(
             @PathVariable Long boardId,
             @PathVariable Long commentId,
-            @SessionAttribute("user") User user
+            @SessionAttribute("user") User loginUser
     ) {
-        commentService.deleteComment(boardId, commentId, user);
+        commentService.deleteComment(boardId, commentId, loginUser);
     }
 }

@@ -10,10 +10,8 @@ import com.spartaboys.newsfeed.domain.comments.exception.*;
 import com.spartaboys.newsfeed.domain.comments.mapper.CommentMapper;
 import com.spartaboys.newsfeed.domain.comments.repository.CommentRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
-import com.spartaboys.newsfeed.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,20 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CommentMapper commentMapper;
 
     // 댓글 생성
     @Transactional
-    public CommentResponse createComment(Long boardId, User user, CommentCreateRequest request) {
+    public CommentResponse createComment(Long boardId, User loginUser, CommentCreateRequest request) {
 
-        // 게시글 및 유저찾기 (임시처리)
+        // 게시글 찾아오기
         Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND));
-        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.USER_NOT_FOUND));
 
         // 댓글 생성
-        Comment comment = commentMapper.toEntity(request, findBoard, findUser);
+        Comment comment = commentMapper.toEntity(request, findBoard, loginUser);
 
         // 댓글 저장
         commentRepository.save(comment);
@@ -47,15 +43,13 @@ public class CommentService {
 
     // 댓글 전체 조회 (해당 게시글)
     @Transactional (readOnly = true)
-    public Page<CommentResponse> findAllByBoardId(Long boardId, int page, int size) {
+    public Page<CommentResponse> getAllByBoardId(Long boardId, Pageable pageable) {
 
         // 게시글 찾기
         Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND));
+
         // 해당 게시글이 삭제 되었는지 확인
         checkBoardIsDelete(findBoard);
-
-        // 페이지 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
 
         // 해당 게시글의 댓글들 가져와서 페이징 조회
         Page<Comment> pageComments = commentRepository.findAllByBoardIdOrderByCreatedAtDesc(boardId, pageable);
@@ -66,17 +60,19 @@ public class CommentService {
 
     // 댓글 단일 조회
     @Transactional (readOnly = true)
-    public CommentResponse findComment(Long boardId, Long commentId) {
-
-        // 게시글 찾기
-        Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND));
-        // 해당 게시글이 삭제 되었는지 확인
-        checkBoardIsDelete(findBoard);
+    public CommentResponse getComment(Long boardId, Long commentId) {
 
         // 해당 댓글 찾기
         Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
+
+        // 해당 게시글이 삭제 되었는지 확인
+        findComment.validNotDeleteBoard();
+
+        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
+        checkBoardId(findComment, boardId);
+
         // 해당 댓글이 삭제 되었는지 확인
-        checkCommentIsDelete(findComment);
+        findComment.validNotDeleteComment();
 
         // 해당 댓글 반환
         return commentMapper.toDto(findComment);
@@ -84,20 +80,22 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public CommentResponse updateComment(Long boardId, Long commentId, User user, CommentUpdateRequest request) {
-
-        // 해당 게시글 찾기
-        Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND));
-        // 해당 게시글이 삭제 되었는지 확인
-        checkBoardIsDelete(findBoard);
+    public CommentResponse updateComment(Long boardId, Long commentId, User loginUser, CommentUpdateRequest request) {
 
         // 해당 댓글 찾기
         Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
+
+        // 해당 게시글이 삭제 되었는지 확인
+        findComment.validNotDeleteBoard();
+
+        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
+        checkBoardId(findComment, boardId);
+
         // 해당 댓글이 삭제 되었는지 확인
-        checkCommentIsDelete(findComment);
+        findComment.validNotDeleteComment();
 
         // 유저의 권한 확인
-        checkPermission(findComment.getUser().getId(), user.getId());
+        checkPermission(findComment, loginUser.getId());
 
         // 댓글 내용 수정
         findComment.updateContent(request.getContent());
@@ -108,20 +106,22 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long boardId, Long commentId, User user) {
-
-        // 해당 게시글 찾기
-        Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND));
-        // 해당 게시글이 삭제 되었는지 확인
-        checkBoardIsDelete(findBoard);
+    public void deleteComment(Long boardId, Long commentId, User loginUser) {
 
         // 해당 댓글 찾기
         Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
+
+        // 해당 게시글이 삭제 되었는지 확인
+        findComment.validNotDeleteBoard();
+
+        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
+        checkBoardId(findComment, boardId);
+
         // 해당 댓글이 삭제 되었는지 확인
-        checkCommentIsDelete(findComment);
+        findComment.validNotDeleteComment();
 
         // 유저의 권한 확인
-        checkPermission(findComment.getUser().getId(), user.getId());
+        checkPermission(findComment, loginUser.getId());
 
         // 해당 댓글 삭제 ( isDelete = true, deletedAt = LocalDateTime.now() )
         findComment.delete();
@@ -135,8 +135,8 @@ public class CommentService {
     // ===== 헬퍼 메서드 =====
 
     // 유저 권한 확인
-    private void checkPermission(Long commentUserId, Long loginUserId) {
-        if (!commentUserId.equals(loginUserId)) {
+    private void checkPermission(Comment comment, Long loginUserId) {
+        if (!comment.getUser().getId().equals(loginUserId)) {
             throw new InvalidCommentException(CommentErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
         }
     }
@@ -148,10 +148,9 @@ public class CommentService {
         }
     }
 
-    // 댓글 삭제 여부
-    private void checkCommentIsDelete(Comment comment) {
-        if (comment.isDeleted()) {
-            throw new InvalidCommentException(CommentErrorCode.COMMENT_NOT_FOUND);
+    private void checkBoardId(Comment comment, Long boardId) {
+        if (!comment.getBoard().getId().equals(boardId)) {
+            throw new InvalidCommentException(CommentErrorCode.BOARD_BAD_REQUEST);
         }
     }
 }
