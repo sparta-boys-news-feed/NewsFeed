@@ -14,9 +14,9 @@ public class BoardMapper {
     // 게시글 CRUD에서 BoardRequest Dto -> Board Entity 변한
     public Board toEntity(BoardRequest request, User user) {
         return Board.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
+                .title(request.title())
                 .user(user)
+                .content(request.content())
                 .build();
     }
 
