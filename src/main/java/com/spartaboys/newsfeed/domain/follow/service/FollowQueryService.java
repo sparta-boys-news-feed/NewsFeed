@@ -1,0 +1,66 @@
+package com.spartaboys.newsfeed.domain.follow.service;
+
+import com.spartaboys.newsfeed.domain.follow.entity.Follow;
+import com.spartaboys.newsfeed.domain.follow.exception.AlreadyFollowingException;
+import com.spartaboys.newsfeed.domain.follow.exception.FollowErrorCode;
+import com.spartaboys.newsfeed.domain.follow.exception.SelfFollowNotAllowedException;
+import com.spartaboys.newsfeed.domain.follow.repository.FollowRepository;
+import com.spartaboys.newsfeed.domain.like.comments.exception.NotCommentOfBoardException;
+import com.spartaboys.newsfeed.domain.like.exception.LikeAccessDeniedException;
+import com.spartaboys.newsfeed.domain.like.exception.LikeNotFoundException;
+import com.spartaboys.newsfeed.domain.users.entity.User;
+import com.spartaboys.newsfeed.domain.users.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class FollowQueryService {
+
+    private final UserService userService;
+
+    private final FollowRepository followRepository;
+
+    /**
+     * 로그인 유저 팔로우 메서드
+     * <p>
+ *     로그인한 사용자 ID(followerId), 팔로우 당하는 사람 ID(followeeId)를 기반으로
+     * 로그인한 사용자가 누른 상대방을 팔로우 한다.
+     * </p>
+     * <h4>비즈니스 규칙</h4>
+     * <ul>
+     *   <li>자기 자신은 팔로우할 수 없다.</li>
+     *   <li>이미 팔로우한 사용자를 다시 팔로우할 수 없다.</li>
+     * </ul>
+     *
+     * <h4>주의 사항</h4>
+     * <ul>
+     *   <li>existsByFollowerAndFollowee → save 사이에 <b>동시성 이슈</b>가 발생할 수 있다.
+     *       즉, 두 요청이 동시에 들어올 경우 중복 팔로우 레코드가 삽입될 수 있음.</li>
+     * </ul>
+     * @param followerId "팔로우 하는 사람" (팔로워, 주체)
+     * @param followeeId "팔로우 당하는 사람" (피팔로워, 대상)
+     * @throws SelfFollowNotAllowedException 자기 자신을 팔로우하는 경우
+     * @throws AlreadyFollowingException     이미 팔로우한 사용자를 중복 팔로우하는 경우
+     */
+    @Transactional
+    public void followUser(Long followerId, Long followeeId) {
+
+        if (followerId.equals(followeeId)) {
+            throw new SelfFollowNotAllowedException(FollowErrorCode.SELF_FOLLOW_NOT_ALLOWED);
+        }
+
+        User follower = userService.getUserById(followerId);
+        User followee = userService.getUserById(followeeId);
+
+        // TODO : 팔로우 동시성 문제
+        if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
+            throw new AlreadyFollowingException(FollowErrorCode.ALREADY_FOLLOWING);
+        }
+
+        followRepository.save(
+                Follow.create(follower, followee)
+        );
+    }
+}
