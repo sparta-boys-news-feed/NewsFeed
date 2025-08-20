@@ -99,7 +99,7 @@ public class CommentService {
         findComment.validateCommentNotDeleted();
 
         // 유저의 권한 확인
-        checkPermission(findComment, loginUser.getId());
+        findComment.validateOwner(loginUser.getId());
 
         // 댓글 내용 수정
         findComment.updateContent(request.getContent());
@@ -125,7 +125,7 @@ public class CommentService {
         findComment.validateCommentNotDeleted();
 
         // 유저의 권한 확인
-        checkPermission(findComment, loginUser.getId());
+        findComment.validateOwner(loginUser.getId());
 
         // 해당 댓글 삭제 ( isDelete = true, deletedAt = LocalDateTime.now() )
         findComment.delete();
@@ -137,13 +137,6 @@ public class CommentService {
 
 
     // ===== 헬퍼 메서드 =====
-
-    // 유저 권한 확인
-    private void checkPermission(Comment comment, Long loginUserId) {
-        if (!comment.getUser().getId().equals(loginUserId)) {
-            throw new InvalidCommentException(CommentErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
-        }
-    }
 
     // 게시글 삭제 여부
     private void checkBoardIsDelete(Board board) {
