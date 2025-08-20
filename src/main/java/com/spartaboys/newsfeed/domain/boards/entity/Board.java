@@ -1,0 +1,49 @@
+package com.spartaboys.newsfeed.domain.boards.entity;
+
+import com.spartaboys.newsfeed.common.entity.BaseEntity;
+import com.spartaboys.newsfeed.domain.users.entity.User;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Board extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = false)
+    private long likes = 0L;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
+
+    @Builder
+    public Board(User user, String title, String content, long likes, boolean isDeleted) {
+        this.user = user;
+        this.title = title;
+        this.content = content;
+        this.likes = likes;
+        this.isDeleted = isDeleted;
+    }
+
+    public void updateBoard(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+}
