@@ -47,15 +47,21 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public void validNotDeleteComment() {
+    public void validateCommentNotDeleted() {
         if (isDeleted()) {
             throw new InvalidCommentException(CommentErrorCode.COMMENT_NOT_FOUND);
         }
     }
 
-    public void validNotDeleteBoard() {
+    public void validateBoardNotDeleted() {
         if (board.isDeleted()) {
             throw new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND);
+        }
+    }
+
+    public void validateBoard(Board board) {
+        if (!board.getId().equals(this.board.getId())) {
+            throw new InvalidCommentException(CommentErrorCode.BOARD_BAD_REQUEST);
         }
     }
 }
