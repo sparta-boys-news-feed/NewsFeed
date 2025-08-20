@@ -1,20 +1,10 @@
 package com.spartaboys.newsfeed.domain.comments.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
-@AllArgsConstructor
-public class CommentResponse {
+public record CommentResponse(Long id, String content, String nickname, int likes, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
-    private final Long id;
-    private final String content;
-    private final String nickname;
-    private final int likes;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    public static CommentResponse toDto(Long id, String content, String nickname, int likes, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        return new CommentResponse(id, content, nickname, likes, createdAt, updatedAt);
+    }
 }
