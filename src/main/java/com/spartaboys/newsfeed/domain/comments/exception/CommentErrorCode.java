@@ -22,7 +22,9 @@ public enum CommentErrorCode implements ErrorCode {
     BOARD_BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 접근입니다."),
 
     // 게시글이 없을 때 (혹은 삭제 됐을 때) NOT_FOUND
-    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
+
+    NOT_COMMENT_OF_BOARD(HttpStatus.BAD_REQUEST, "해당 댓글은 지정된 게시글에 속하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;

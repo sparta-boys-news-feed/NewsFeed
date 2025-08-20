@@ -4,12 +4,15 @@ import com.spartaboys.newsfeed.common.entity.BaseEntity;
 import com.spartaboys.newsfeed.domain.board.entity.Board;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
 import com.spartaboys.newsfeed.domain.comments.exception.InvalidCommentException;
+import com.spartaboys.newsfeed.domain.like.exception.CannotDecreaseLikesException;
+import com.spartaboys.newsfeed.domain.like.exception.LikeErrorCode;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.ObjectUtils;
 
 @Entity
 @Getter
@@ -69,5 +72,20 @@ public class Comment extends BaseEntity {
         if (!this.user.getId().equals(userId)) {
             throw new InvalidCommentException(CommentErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
         }
+    }
+
+    public boolean isOwnedBy(Board board) {
+        return ObjectUtils.nullSafeEquals(this.board, board);
+    }
+
+    public void increaseLikes() {
+        likes++;
+    }
+
+    public void decreaseLikes() {
+        if (likes <= 0) {
+            throw new CannotDecreaseLikesException(LikeErrorCode.CANNOT_DECREASE_LIKES);
+        }
+        likes--;
     }
 }
