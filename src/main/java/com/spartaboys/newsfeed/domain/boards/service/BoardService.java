@@ -24,8 +24,8 @@ public class BoardService {
 
 
     @Transactional
-    public BoardResponse getBoardByUserId(BoardRequest request,
-                                          User loginUser) {
+    public BoardResponse createBoardByUserId(BoardRequest request,
+                                             User loginUser) {
         // DB에 게시글 저장
         Board board = boardRepository.save(boardMapper.toEntity(request, loginUser));
 

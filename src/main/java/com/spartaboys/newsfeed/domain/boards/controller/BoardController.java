@@ -22,9 +22,9 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BoardResponse>> getBoardByUserId(@Validated @RequestBody BoardRequest request,
-                                                                       @SessionAttribute(value = "USER") User loginUser) {
-        return ApiResponse.created(boardService.getBoardByUserId(request, loginUser));
+    public ResponseEntity<ApiResponse<BoardResponse>> createBoardByUserId(@Validated @RequestBody BoardRequest request,
+                                                                          @SessionAttribute(value = "USER") User loginUser) {
+        return ApiResponse.created(boardService.createBoardByUserId(request, loginUser));
     }
 
     @GetMapping
