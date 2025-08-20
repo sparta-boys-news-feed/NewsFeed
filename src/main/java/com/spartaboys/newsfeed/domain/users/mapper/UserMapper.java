@@ -11,6 +11,6 @@ public class UserMapper {
     public UserPublicResponse toPublicResponse(User user) {
         return UserPublicResponse.toDto(user.getId(), user.getNickname());
     }
-    public UserPrivateResponse toPrivateResponse(User user) { return UserPrivateResponse.toDto(user.getId(), user.getEmail(), user.getNickname(), user.getCreatedAt(), user.getModifiedAt()); }
-    public UserUpdateResponse toUpdateResponse(User user) { return UserUpdateResponse.toDto(user.getId(), user.getNickname(), user.getModifiedAt()); }
+    public UserPrivateResponse toPrivateResponse(User user) { return UserPrivateResponse.toDto(user.getId(), user.getEmail(), user.getNickname(), user.getCreatedAt(), user.getUpdatedAt()); }
+    public UserUpdateResponse toUpdateResponse(User user) { return UserUpdateResponse.toDto(user.getId(), user.getNickname(), user.getUpdatedAt()); }
 }

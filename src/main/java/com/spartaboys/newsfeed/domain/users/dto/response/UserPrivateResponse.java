@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 
 public record UserPrivateResponse(
         Long id, String email, String nickname,
-        LocalDateTime createdAt, LocalDateTime modifiedAt
+        LocalDateTime createdAt, LocalDateTime updatedAt
 ) {
     public static UserPrivateResponse toDto(
             Long id, String email, String nickname,
-            LocalDateTime createdAt, LocalDateTime modifiedAt
+            LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
-        return new UserPrivateResponse(id, email, nickname, createdAt, modifiedAt);
+        return new UserPrivateResponse(id, email, nickname, createdAt, updatedAt);
     }
 }

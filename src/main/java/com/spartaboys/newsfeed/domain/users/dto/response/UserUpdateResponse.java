@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 
 public record UserUpdateResponse(
         Long id, String nickname,
-        LocalDateTime modifiedAt
+        LocalDateTime updatedAt
 ) {
     public static UserUpdateResponse toDto(
             Long id, String nickname,
-            LocalDateTime modifiedAt
+            LocalDateTime updatedAt
     ) {
-        return new UserUpdateResponse(id, nickname, modifiedAt);
+        return new UserUpdateResponse(id, nickname, updatedAt);
     }
 }
