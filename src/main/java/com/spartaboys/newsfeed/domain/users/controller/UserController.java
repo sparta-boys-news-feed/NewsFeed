@@ -57,6 +57,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserPublicResponse>> getUserById(
             @PathVariable Long userId
     ) {
+
         UserPublicResponse publicUserInfo = userService.getPublicUserById(userId);
 
         return ApiResponse.success(publicUserInfo);
@@ -83,7 +84,6 @@ public class UserController {
 
         return ApiPageResponse.success(userService.getCommentsByUserId(pageable, userId));
     }
-
 
     // TODO: 임의로 세션을 통해 구현 (추후 로직 변경 시 반영)
     @GetMapping("/me")
