@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.comments.service;
 
-import com.spartaboys.newsfeed.domain.board.entity.Board;
-import com.spartaboys.newsfeed.domain.board.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
 import com.spartaboys.newsfeed.domain.comments.service.CommentService;
