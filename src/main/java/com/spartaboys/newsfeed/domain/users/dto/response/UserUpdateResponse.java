@@ -6,7 +6,7 @@ public record UserUpdateResponse(
         Long id, String nickname,
         LocalDateTime modifiedAt
 ) {
-    public static UserUpdateResponse of(
+    public static UserUpdateResponse toDto(
             Long id, String nickname,
             LocalDateTime modifiedAt
     ) {

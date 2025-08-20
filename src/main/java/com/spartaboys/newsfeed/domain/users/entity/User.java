@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "users",
         // Unique 설정, 제약조건 이름 부여 및 DDL 반영

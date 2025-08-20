@@ -6,7 +6,7 @@ public record UserPrivateResponse(
         Long id, String email, String nickname,
         LocalDateTime createdAt, LocalDateTime modifiedAt
 ) {
-    public static UserPrivateResponse of(
+    public static UserPrivateResponse toDto(
             Long id, String email, String nickname,
             LocalDateTime createdAt, LocalDateTime modifiedAt
     ) {
