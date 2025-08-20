@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.domain.users.controller;
 
 import com.spartaboys.newsfeed.common.exception.ErrorCode;
+import com.spartaboys.newsfeed.common.response.ApiResponse;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
 import com.spartaboys.newsfeed.domain.users.dto.request.UserUpdateRequest;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPrivateResponse;
@@ -33,26 +34,26 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserPublicResponse> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<UserPublicResponse>> getUserById(@PathVariable Long userId) {
         UserPublicResponse publicUserInfo = userService.getPublicUserById(userId);
 
-        return ResponseEntity.ok(publicUserInfo);
+        return ApiResponse.success(publicUserInfo);
     }
 
-    // 임의로 세션을 통해 구현
+    // TODO: 임의로 세션을 통해 구현 (추후 로직 변경 시 반영)
     @GetMapping("/me")
-    public ResponseEntity<UserPrivateResponse> getCurrentUser(
+    public ResponseEntity<ApiResponse<UserPrivateResponse>> getCurrentUser(
             HttpSession session
     ) {
         UserPrivateResponse privateUserInfo = userService.getPrivateUserById(
                 getUserIdFromSession(session)
         );
 
-        return ResponseEntity.ok(privateUserInfo);
+        return ApiResponse.success(privateUserInfo);
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UserUpdateResponse> updateCurrentUser(
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> updateCurrentUser(
             HttpSession session,
             @Valid @RequestBody UserUpdateRequest dto
     ) {
@@ -60,17 +61,17 @@ public class UserController {
                 getUserIdFromSession(session), dto
         );
 
-        return ResponseEntity.ok(updateUserInfo);
+        return ApiResponse.success(updateUserInfo);
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> updatePassword(
+    public ResponseEntity<ApiResponse<Void>> updatePassword(
             HttpSession session,
             @Valid @RequestBody ChangePasswordRequest dto
     ) {
         userService.updateUserPassword(getUserIdFromSession(session), dto);
 
-        return ResponseEntity.noContent().build();
+        return ApiResponse.noContent();
     }
 
 
