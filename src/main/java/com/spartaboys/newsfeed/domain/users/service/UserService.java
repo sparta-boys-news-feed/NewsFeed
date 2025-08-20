@@ -55,6 +55,16 @@ public class UserService {
         return getUserOrThrow(userID);
     }
 
+    public boolean isUserValid(Long userID) {
+        try{
+            getUserOrThrow(userID);
+        } catch (InvalidUserException e) {
+            return false;
+        }
+
+        return true;
+    }
+
     // 본 메소드
     public UserPublicResponse getPublicUserById(Long id) {
         return getUserMapped(id, userMapper::toPublicResponse);
