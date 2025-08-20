@@ -1,20 +1,9 @@
 package com.spartaboys.newsfeed.domain.boards.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
-public class BoardResponse {
-    private final Long Id;
-    private final Long userId;
-    private final String title;
-    private final String content;
-    private final Long likes;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final LocalDateTime deletedAt;
-    private final boolean isDeleted;
+@Builder
+public record BoardResponse(Long Id, Long userId, String title, String content, Long likes, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, boolean isDeleted) {
 }
