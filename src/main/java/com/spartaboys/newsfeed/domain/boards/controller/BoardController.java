@@ -22,48 +22,50 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BoardResponse>> create(@Validated @RequestBody BoardRequest request,
-                                                             @SessionAttribute(value = "USER", required = false) User loginUser) {
-        return ApiResponse.created(boardService.create(request, loginUser));
+    public ResponseEntity<ApiResponse<BoardResponse>> getBoardByUserId(@Validated @RequestBody BoardRequest request,
+                                                                       @SessionAttribute(value = "USER") User loginUser) {
+        return ApiResponse.created(boardService.getBoardByUserId(request, loginUser));
     }
 
     @GetMapping
-    public ResponseEntity<ApiPageResponse<BoardResponse>> getAll(@RequestParam(required = false, defaultValue = "0") int page,
+    public ResponseEntity<ApiPageResponse<BoardResponse>> getAllBoards(@RequestParam(required = false, defaultValue = "0") int page,
                                                                  @RequestParam(required = false, defaultValue = "10") int size) {
         // Pageable 객체 생성(현재 정책상 Client는 page, size, Service는 sort를 담당하고 있으나 추후 확장성을 고려하여 컨트롤에서 생성)
         // 생성일 기준 내림차순으로 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
 
-        return ApiPageResponse.success(boardService.getAll(pageable));
+        return ApiPageResponse.success(boardService.getAllBoards(pageable));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiPageResponse<BoardResponse>> getWithTitleAndContent(@RequestParam(required = false, defaultValue = "0") int page,
-                                                                                 @RequestParam(required = false, defaultValue = "10") int size,
-                                                                                 @RequestParam(required = false) String title,
-                                                                                 @RequestParam(required = false) String content) {
+    public ResponseEntity<ApiPageResponse<BoardResponse>> getBoardsByTitleOrContent(@RequestParam(required = false, defaultValue = "0") int page,
+                                                                                    @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                    @RequestParam(required = false) String title,
+                                                                                    @RequestParam(required = false) String content) {
         // Pageable 객체 생성(현재 정책상 Client는 page, size, Service는 sort를 담당하고 있으나 추후 확장성을 고려하여 컨트롤에서 생성)
         // 생성일 기준 내림차순으로 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
 
-        return ApiPageResponse.success(boardService.getWithTitleAndContent(pageable, title, content));
+        return ApiPageResponse.success(boardService.getBoardsByTitleOrContent(pageable, title, content));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<BoardResponse>> get(@PathVariable Long id) {
-        return ApiResponse.success(boardService.get(id));
+    @GetMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<BoardResponse>> getBoardByBoardId(@PathVariable Long boardId) {
+        return ApiResponse.success(boardService.getBoardByBoardId(boardId));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<BoardResponse>> editTitleAndContent(@PathVariable Long id,
-                                                                          @SessionAttribute(value = "USER", required = false) User loginUser,
-                                                                          @Validated @RequestBody BoardRequest request) {
-        return ApiResponse.success(boardService.editBoardTitleAndContent(id, loginUser, request));
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<BoardResponse>> updateBoardDetailsByBoardId(@PathVariable Long boardId,
+                                                                                  @SessionAttribute(value = "USER") User loginUser,
+                                                                                  @Validated @RequestBody BoardRequest request) {
+        return ApiResponse.success(boardService.updateBoardDetailsByBoardId(boardId, loginUser, request));
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id,
-                       @SessionAttribute(value = "USER", required = false) User loginUser) {
-        boardService.delete(id, loginUser);
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<Object>> deleteBoardByBoardId(@PathVariable Long boardId,
+                                                                    @SessionAttribute(value = "USER") User loginUser) {
+        boardService.deleteBoardByBoardId(boardId, loginUser);
+
+        return ApiResponse.noContent();
     }
 }
