@@ -34,6 +34,4 @@ public class BoardMapper {
                 .title(board.getTitle())
                 .build();
     }
-
-    ;
 }
