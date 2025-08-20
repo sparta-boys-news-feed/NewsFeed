@@ -1,6 +1,8 @@
 package com.spartaboys.newsfeed.domain.boards.entity;
 
 import com.spartaboys.newsfeed.common.entity.BaseEntity;
+import com.spartaboys.newsfeed.domain.like.exception.CannotDecreaseLikesException;
+import com.spartaboys.newsfeed.domain.like.exception.LikeErrorCode;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -30,16 +32,12 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private long likes = 0L;
 
-    @Column(nullable = false)
-    private boolean isDeleted;
-
     @Builder
-    public Board(User user, String title, String content, long likes, boolean isDeleted) {
+    public Board(User user, String title, String content, long likes) {
         this.user = user;
         this.title = title;
         this.content = content;
         this.likes = likes;
-        this.isDeleted = isDeleted;
     }
 
     public void updateBoard(String title, String content) {
