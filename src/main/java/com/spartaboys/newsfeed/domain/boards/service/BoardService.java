@@ -81,7 +81,7 @@ public class BoardService {
         if (!board.getUser().getId().equals(loginUser.getId())) throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
 
         // 게시글 수정사항 반영
-        board.updateBoard(request.getTitle(), request.getContent());
+        board.updateBoard(request.title(), request.content());
 
         return boardMapper.toDto(board);
     }
