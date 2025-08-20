@@ -37,7 +37,7 @@ public class BoardLikeQueryService {
      */
     @Transactional
     public void likeBoard(Long loginId, Long boardId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
 
         // 좋아요 중복 방지
@@ -70,7 +70,7 @@ public class BoardLikeQueryService {
      */
     @Transactional
     public void unlikeBoard(long loginId, Long boardId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
 
         BoardLike boardLike = boardLikeRepository.findByUserAndBoard(user, board)
