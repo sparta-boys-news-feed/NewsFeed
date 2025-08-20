@@ -64,4 +64,10 @@ public class Comment extends BaseEntity {
             throw new InvalidCommentException(CommentErrorCode.BOARD_BAD_REQUEST);
         }
     }
+
+    public void validateOwner(Long userId) {
+        if (!this.user.getId().equals(userId)) {
+            throw new InvalidCommentException(CommentErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
+        }
+    }
 }
