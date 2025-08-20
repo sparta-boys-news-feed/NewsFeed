@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.entity;
 
 import com.spartaboys.newsfeed.domain.board.entity.Board;
-import com.spartaboys.newsfeed.domain.User;
+import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
