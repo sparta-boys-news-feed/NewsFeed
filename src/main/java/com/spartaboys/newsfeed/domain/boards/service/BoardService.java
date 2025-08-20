@@ -67,7 +67,7 @@ public class BoardService {
             return boards.map(boardMapper::toDto);
         }
         // title과 content가 모두 있거나 모두 없는 경우 예외처리
-        else throw new InvalidBoardException(BoardErrorCode.INVALID_BOARD_SEARCH_NOT_ALLOWED);
+        else throw new InvalidBoardException(BoardErrorCode.BOARD_INVALID_SEARCH_NOT_ALLOWED);
     }
 
     @Transactional
