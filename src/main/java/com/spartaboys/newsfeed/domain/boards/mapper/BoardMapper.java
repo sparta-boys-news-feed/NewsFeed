@@ -22,16 +22,17 @@ public class BoardMapper {
 
     // 게시글 CRUD에서 Board Entity -> BoardRequest Dto 변한
     public BoardResponse toDto(Board board) {
-        return new BoardResponse(
-                board.getId(),
-                board.getUser().getId(),
-                board.getTitle(),
-                board.getContent(),
-                board.getLikes(),
-                board.getCreatedAt(),
-                board.getUpdatedAt(),
-                board.getDeletedAt(),
-                board.isDeleted());
+        return BoardResponse.builder()
+                .Id(board.getId())
+                .likes(board.getLikes())
+                .deletedAt(board.getDeletedAt())
+                .userId(board.getUser().getId())
+                .createdAt(board.getCreatedAt())
+                .updatedAt(board.getUpdatedAt())
+                .content(board.getContent())
+                .isDeleted(board.isDeleted())
+                .title(board.getTitle())
+                .build();
     }
 
     ;
