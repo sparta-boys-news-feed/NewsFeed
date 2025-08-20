@@ -69,7 +69,7 @@ public class BoardLikeQueryService {
      * @throws LikeAccessDeniedException 좋아요 작성자가 아닌 사용자가 삭제를 시도한 경우
      */
     @Transactional
-    public void delete(long loginId, Long boardId) {
+    public void unlikeBoard(long loginId, Long boardId) {
         User user = userService.getUserById(loginId);
         Board board = boardService.getBoardById(boardId);
 
