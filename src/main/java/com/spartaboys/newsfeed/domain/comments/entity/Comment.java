@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.comments.entity;
 
 import com.spartaboys.newsfeed.common.entity.BaseEntity;
-import com.spartaboys.newsfeed.domain.board.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
 import com.spartaboys.newsfeed.domain.comments.exception.InvalidCommentException;
 import com.spartaboys.newsfeed.domain.like.exception.CannotDecreaseLikesException;

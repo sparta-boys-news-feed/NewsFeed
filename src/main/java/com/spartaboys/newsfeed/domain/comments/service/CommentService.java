@@ -144,4 +144,8 @@ public class CommentService {
             throw new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND);
         }
     }
+
+    public Comment getCommentById(Long commentId) {
+        return commentRepository.findByIdOrThrowElse(commentId);
+    }
 }
