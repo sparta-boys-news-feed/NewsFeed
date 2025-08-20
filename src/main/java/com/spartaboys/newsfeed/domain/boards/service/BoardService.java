@@ -24,15 +24,15 @@ public class BoardService {
 
 
     @Transactional
-    public BoardResponse create(BoardRequest request,
-                                User loginUser) {
+    public BoardResponse getBoardByUserId(BoardRequest request,
+                                          User loginUser) {
         // DB에 게시글 저장
         Board board = boardRepository.save(boardMapper.toEntity(request, loginUser));
 
         return boardMapper.toDto(board);
     }
 
-    public Page<BoardResponse> getAll(Pageable pageable) {
+    public Page<BoardResponse> getAllBoards(Pageable pageable) {
 
         // pageable 조건을 기준으로 모든 게시글 조회
         Page<Board> boards = boardRepository.findAll(pageable);
@@ -40,7 +40,7 @@ public class BoardService {
         return boards.map(boardMapper::toDto);
     }
 
-    public BoardResponse get(Long boardId) {
+    public BoardResponse getBoardByBoardId(Long boardId) {
 
         // DB에 boardId가 없을 경우 예외처리
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
@@ -50,7 +50,7 @@ public class BoardService {
         return boardMapper.toDto(board);
     }
 
-    public Page<BoardResponse> getWithTitleAndContent(Pageable pageable, String title, String content) {
+    public Page<BoardResponse> getBoardsByTitleOrContent(Pageable pageable, String title, String content) {
         // TODO: 리팩토링이 필요할 것으로 사료
         // content만 있을 경우 content로 조회
         if (title != null && content == null) {
@@ -71,7 +71,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponse editBoardTitleAndContent(Long boardId, User loginUser, BoardRequest request) {
+    public BoardResponse updateBoardDetailsByBoardId(Long boardId, User loginUser, BoardRequest request) {
 
         // DB에 boardId가 없을 경우 예외처리
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
@@ -87,7 +87,7 @@ public class BoardService {
     }
 
     @Transactional
-    public void delete(Long boardId, User loginUser) {
+    public void deleteBoardByBoardId(Long boardId, User loginUser) {
 
         // DB에 boardId가 없을 경우 예외처리
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
