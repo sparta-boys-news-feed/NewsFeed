@@ -36,7 +36,7 @@ public class BoardLikeQueryService {
      * @throws IllegalStateException 사용자가 이미 같은 게시글에 좋아요를 눌렀을 경우 발생
      */
     @Transactional
-    public void registerBoardLike(Long loginId, Long boardId) {
+    public void likeBoard(Long loginId, Long boardId) {
         User user = userService.getUserById(loginId);
         Board board = boardService.getBoardById(boardId);
 

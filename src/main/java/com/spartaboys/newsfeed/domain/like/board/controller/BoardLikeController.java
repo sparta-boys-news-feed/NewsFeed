@@ -14,11 +14,11 @@ public class BoardLikeController {
     private final BoardLikeQueryService boardLikeQueryService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> registerBoardLike(
+    public ResponseEntity<ApiResponse<Void>> likeBoard(
             @SessionAttribute(name = "login_id") Long loginId,
             @PathVariable Long boardId
     ) {
-        boardLikeQueryService.registerBoardLike(loginId, boardId);
+        boardLikeQueryService.likeBoard(loginId, boardId);
         return ApiResponse.noContent();
     }
 
