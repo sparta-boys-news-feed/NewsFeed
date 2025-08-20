@@ -23,11 +23,11 @@ public class BoardLikeController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteBoardLike(
+    public ResponseEntity<ApiResponse<Void>> unlikeBoard(
             @SessionAttribute(name = "login_id") Long loginId,
             @PathVariable Long boardId
     ) {
-        boardLikeQueryService.delete(loginId, boardId);
+        boardLikeQueryService.unlikeBoard(loginId, boardId);
         return ApiResponse.noContent();
     }
 
