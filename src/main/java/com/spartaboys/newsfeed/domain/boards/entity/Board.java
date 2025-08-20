@@ -44,4 +44,15 @@ public class Board extends BaseEntity {
         this.title = title;
         this.content = content;
     }
+
+    public void increaseLikes() {
+        likes++;
+    }
+
+    public void decreaseLikes() {
+        if (likes <= 0) {
+            throw new CannotDecreaseLikesException(LikeErrorCode.CANNOT_DECREASE_LIKES);
+        }
+        likes--;
+    }
 }
