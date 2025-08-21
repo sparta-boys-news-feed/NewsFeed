@@ -1,11 +1,9 @@
 package com.spartaboys.newsfeed.domain.users.service;
 
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
-import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
-import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.mapper.CommentMapper;
 import com.spartaboys.newsfeed.domain.comments.service.CommentService;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService {
+public class UserExternalService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final BoardService boardService;
@@ -48,21 +46,6 @@ public class UserService {
         User user = getUserOrThrow(id);
 
         return mapper.apply(user);
-    }
-
-    // 외부 서비스 연동용
-    public User getUserObjectById(Long userID) {
-        return getUserOrThrow(userID);
-    }
-
-    public boolean isUserValid(Long userID) {
-        try{
-            getUserOrThrow(userID);
-        } catch (InvalidUserException e) {
-            return false;
-        }
-
-        return true;
     }
 
     // 본 메소드

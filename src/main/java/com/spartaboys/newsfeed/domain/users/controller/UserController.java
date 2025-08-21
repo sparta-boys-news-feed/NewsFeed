@@ -1,6 +1,5 @@
 package com.spartaboys.newsfeed.domain.users.controller;
 
-import com.spartaboys.newsfeed.common.exception.ErrorCode;
 import com.spartaboys.newsfeed.common.response.ApiPageResponse;
 import com.spartaboys.newsfeed.common.response.ApiResponse;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
@@ -14,7 +13,7 @@ import com.spartaboys.newsfeed.domain.users.dto.response.UserPublicResponse;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserUpdateResponse;
 import com.spartaboys.newsfeed.domain.users.exception.InvalidUserException;
 import com.spartaboys.newsfeed.domain.users.exception.UserErrorCode;
-import com.spartaboys.newsfeed.domain.users.service.UserService;
+import com.spartaboys.newsfeed.domain.users.service.UserExternalService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final UserExternalService userService;
 
     private Long getUserIdFromSession(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
