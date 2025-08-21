@@ -1,4 +1,4 @@
-package com.spartaboys.newsfeed.domain.follow.service;
+package com.spartaboys.newsfeed.domain.follow.service.external;
 
 import com.spartaboys.newsfeed.domain.follow.entity.Follow;
 import com.spartaboys.newsfeed.domain.follow.exception.AlreadyFollowingException;
@@ -7,7 +7,7 @@ import com.spartaboys.newsfeed.domain.follow.exception.SelfFollowNotAllowedExcep
 import com.spartaboys.newsfeed.domain.follow.exception.SelfUnFollowNotAllowedException;
 import com.spartaboys.newsfeed.domain.follow.repository.FollowRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
-import com.spartaboys.newsfeed.domain.users.service.UserService;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FollowCommandService {
 
-    private final UserService userService;
+    private final UserInternalService userInternalService;
 
     private final FollowRepository followRepository;
 
@@ -50,8 +50,8 @@ public class FollowCommandService {
             throw new SelfFollowNotAllowedException(FollowErrorCode.SELF_FOLLOW_NOT_ALLOWED);
         }
 
-        User follower = userService.getUserById(followerId);
-        User followee = userService.getUserById(followeeId);
+        User follower = userInternalService.getUserObjectById(followerId);
+        User followee = userInternalService.getUserObjectById(followeeId);
 
         // TODO : 팔로우 동시성 문제 : 비관적 Lock
         if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
