@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.comments.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiResponse;
-import com.spartaboys.newsfeed.domain.like.comments.service.CommentLikeQueryService;
+import com.spartaboys.newsfeed.domain.like.comments.service.CommentLikeCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentLikeController {
 
-    private final CommentLikeQueryService commentLikeQueryService;
+    private final CommentLikeCommandService commentLikeCommandService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> likeComment(
@@ -19,7 +19,7 @@ public class CommentLikeController {
             @PathVariable Long boardId,
             @PathVariable Long commentId
     ) {
-        commentLikeQueryService.likeComment(loginId, boardId, commentId);
+        commentLikeCommandService.likeComment(loginId, boardId, commentId);
         return ApiResponse.noContent();
     }
 
@@ -29,7 +29,7 @@ public class CommentLikeController {
             @PathVariable Long boardId,
             @PathVariable Long commentId
     ) {
-        commentLikeQueryService.unlikeComment(loginId, boardId, commentId);
+        commentLikeCommandService.unlikeComment(loginId, boardId, commentId);
         return ApiResponse.noContent();
     }
 
