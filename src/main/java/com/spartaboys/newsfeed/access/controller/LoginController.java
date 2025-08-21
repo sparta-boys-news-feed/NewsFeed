@@ -1,0 +1,92 @@
+package com.spartaboys.newsfeed.access.controller;
+
+import com.spartaboys.newsfeed.access.Dto.*;
+import com.spartaboys.newsfeed.access.JwtTokenUtil;
+import com.spartaboys.newsfeed.access.User;
+import com.spartaboys.newsfeed.access.service.LoginUserServiceSample;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/jwt-login")
+public class LoginController {
+
+    private final LoginUserServiceSample loginUserServiceSample;
+
+//    @Value("${jwt.secretKey}") //
+//    String JWT_SECRET;
+    private static final String JWT_SECRET = "super-secret-key-change-me-32bytes-minimum-aaaaaaaaaaaa";
+    private static final long ACCESS_EXP_MS = 15 * 60 * 1000L;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest,
+                                   HttpServletRequest request) {
+
+        LoginResponse response = loginUserServiceSample.login(loginRequest);
+
+        //로그인 아이디를 받아서 회원 정보 조회 -> 없을시 예외처리
+        User user = loginUserServiceSample.findByLoginId(loginRequest.getLoginId());
+
+        // 로그인 아이디나 비밀번호가 틀린 경우 -> 예외처리
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("message","로그인 아이디 또는 비밀번호가 틀렸습니다"));
+        }
+
+        //비밀번호 검증
+
+        //JWT 토큰 생성
+
+        // 서명 과 완료를 JWTToken에 부여
+        String accessToken = JwtTokenUtil.createToken(user.getLoginId(), JWT_SECRET, ACCESS_EXP_MS);
+        long expireTimesMs = 1000 * 60 * 60; // 토큰 유효 시간
+
+       // String token = JwtTokenUtil.createToken(user.getLoginId(), accessToken , expireTimesMs);
+
+        //세션에 저장
+        HttpSession session = request.getSession(true);
+        session.setAttribute("LOGIN_USER_ID", user.getId());
+        session.setAttribute("LOGIN_ID", user.getLoginId());
+
+        // Map 그대로 반환 Json
+        return ResponseEntity.ok(Map.of(
+                "tokenType","Bearer",
+                "accessToken", response.getToken(),
+                "expiresIn", expireTimesMs / 1000 * 60 * 60
+        ));
+    }
+
+    @PostMapping("/signUp")
+    public UserSignUpResponse signUp(@RequestBody UserSignUpRequest signUpRequest){
+        return loginUserServiceSample.SignUp(signUpRequest);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteUser(HttpServletRequest request){
+
+        HttpSession session = request.getSession(false);
+        if (session == null) return ResponseEntity.status(401).build();
+
+        Long id = (Long) session.getAttribute("LOGIN_USER_ID");
+        if (id == null) return ResponseEntity.status(401).build();
+
+        loginUserServiceSample.deleteUserByid(id);
+
+        session.invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logOut")
+    public String logOut(@RequestBody HttpServletRequest request){
+        loginUserServiceSample.logOut(request);
+
+        return "로그아웃이 되었습니다.";
+    }
+
+}
