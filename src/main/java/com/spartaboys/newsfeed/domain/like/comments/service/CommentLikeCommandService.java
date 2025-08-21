@@ -14,16 +14,17 @@ import com.spartaboys.newsfeed.domain.like.exception.LikeAccessDeniedException;
 import com.spartaboys.newsfeed.domain.like.exception.LikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.exception.LikeNotFoundException;
 import com.spartaboys.newsfeed.domain.users.entity.User;
-import com.spartaboys.newsfeed.domain.users.service.UserService;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CommentLikeQueryService {
+@Transactional
+public class CommentLikeCommandService {
 
-    private final UserService userService;
+    private final UserInternalService userInternalService;
     private final BoardService boardService;
     private final CommentService commentService;
 
@@ -48,9 +49,8 @@ public class CommentLikeQueryService {
      * @throws NotCommentOfBoardException 댓글이 게시글에 속하지 않은 경우
      * @throws AlreadyLikedException      사용자가 이미 좋아요를 누른 경우
      */
-    @Transactional
     public void likeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
@@ -94,9 +94,8 @@ public class CommentLikeQueryService {
      * @throws LikeNotFoundException      삭제할 댓글 좋아요가 존재하지 않는 경우
      * @throws LikeAccessDeniedException  좋아요 작성자가 아닌 사용자가 삭제를 시도한 경우
      */
-    @Transactional
     public void unlikeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
