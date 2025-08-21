@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.board.service;
 
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
-import com.spartaboys.newsfeed.domain.boards.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
 import com.spartaboys.newsfeed.domain.like.board.exception.BoardLikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.board.repository.BoardLikeRepository;
 import com.spartaboys.newsfeed.domain.like.entity.BoardLike;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardLikeCommandService {
 
     private final UserInternalService userInternalService;
-    private final BoardService boardService;
+    private final BoardInternalService boardInternalService;
 
     private final BoardLikeRepository boardLikeRepository;
 
@@ -38,7 +38,7 @@ public class BoardLikeCommandService {
      */
     public void likeBoard(Long loginId, Long boardId) {
         User user = userInternalService.getUserObjectById(loginId);
-        Board board = boardService.getBoardById(boardId);
+        Board board = boardInternalService.getBoardById(boardId);
 
         // 좋아요 중복 방지
         if (boardLikeRepository.existsByUserAndBoard(user, board)) {
@@ -70,7 +70,7 @@ public class BoardLikeCommandService {
      */
     public void unlikeBoard(long loginId, Long boardId) {
         User user = userInternalService.getUserObjectById(loginId);
-        Board board = boardService.getBoardById(boardId);
+        Board board = boardInternalService.getBoardById(boardId);
 
         BoardLike boardLike = boardLikeRepository.findByUserAndBoard(user, board)
                 .orElseThrow(() -> new LikeNotFoundException(LikeErrorCode.LIKE_NOT_FOUND));
