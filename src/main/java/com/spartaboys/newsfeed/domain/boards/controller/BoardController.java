@@ -5,7 +5,7 @@ import com.spartaboys.newsfeed.common.response.ApiResponse;
 import com.spartaboys.newsfeed.domain.boards.dto.request.BoardRequest;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
-import com.spartaboys.newsfeed.domain.boards.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.service.BoardExternalService;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/boards")
 public class BoardController {
-    private final BoardService boardService;
+    private final BoardExternalService boardExternalService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<BoardResponse>> getBoardByUserId(@Validated @RequestBody BoardRequest request,
                                                                        @SessionAttribute(value = "USER") User loginUser) {
-        return ApiResponse.created(boardService.getBoardByUserId(request, loginUser));
+        return ApiResponse.created(boardExternalService.getBoardByUserId(request, loginUser));
     }
 
     @GetMapping
@@ -34,7 +34,7 @@ public class BoardController {
         // 생성일 기준 내림차순으로 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
 
-        return ApiPageResponse.success(boardService.getAllBoards(pageable));
+        return ApiPageResponse.success(boardExternalService.getAllBoards(pageable));
     }
 
     @GetMapping("/search")
@@ -46,25 +46,25 @@ public class BoardController {
         // 생성일 기준 내림차순으로 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
 
-        return ApiPageResponse.success(boardService.getBoardsByTitleOrContent(pageable, title, content));
+        return ApiPageResponse.success(boardExternalService.getBoardsByTitleOrContent(pageable, title, content));
     }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<ApiResponse<BoardResponse>> getBoardByBoardId(@PathVariable Long boardId) {
-        return ApiResponse.success(boardService.getBoardByBoardId(boardId));
+        return ApiResponse.success(boardExternalService.getBoardByBoardId(boardId));
     }
 
     @PatchMapping("/{boardId}")
     public ResponseEntity<ApiResponse<BoardResponse>> updateBoardDetailsByBoardId(@PathVariable Long boardId,
                                                                                   @SessionAttribute(value = "USER") User loginUser,
                                                                                   @Validated @RequestBody BoardRequest request) {
-        return ApiResponse.success(boardService.updateBoardDetailsByBoardId(boardId, loginUser, request));
+        return ApiResponse.success(boardExternalService.updateBoardDetailsByBoardId(boardId, loginUser, request));
     }
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<ApiResponse<Object>> deleteBoardByBoardId(@PathVariable Long boardId,
                                                                     @SessionAttribute(value = "USER") User loginUser) {
-        boardService.deleteBoardByBoardId(boardId, loginUser);
+        boardExternalService.deleteBoardByBoardId(boardId, loginUser);
 
         return ApiResponse.noContent();
     }
