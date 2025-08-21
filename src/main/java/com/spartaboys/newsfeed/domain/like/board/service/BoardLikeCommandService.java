@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BoardLikeQueryService {
+@Transactional
+public class BoardLikeCommandService {
 
     private final UserInternalService userInternalService;
     private final BoardService boardService;
@@ -35,7 +36,6 @@ public class BoardLikeQueryService {
      * @param boardId 좋아요가 눌린 게시글 ID
      * @throws IllegalStateException 사용자가 이미 같은 게시글에 좋아요를 눌렀을 경우 발생
      */
-    @Transactional
     public void likeBoard(Long loginId, Long boardId) {
         User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
@@ -68,7 +68,6 @@ public class BoardLikeQueryService {
      * @throws LikeNotFoundException     사용자가 해당 게시글에 좋아요를 누르지 않은 경우
      * @throws LikeAccessDeniedException 좋아요 작성자가 아닌 사용자가 삭제를 시도한 경우
      */
-    @Transactional
     public void unlikeBoard(long loginId, Long boardId) {
         User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
