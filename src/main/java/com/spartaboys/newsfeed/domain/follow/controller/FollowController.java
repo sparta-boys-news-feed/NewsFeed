@@ -58,4 +58,13 @@ public class FollowController {
         Page<FollowerResponse> followerResponses = followQueryService.getFollowers(loginId, pageable);
         return ApiPageResponse.success(followerResponses);
     }
+
+    @DeleteMapping("/followers/{followerId}")
+    public ResponseEntity<ApiResponse<Void>> removeFollower(
+            @SessionAttribute(name = "login_id") Long loginId,
+            @PathVariable Long followerId
+    ) {
+        followCommandService.removeFollower(loginId, followerId);
+        return ApiResponse.noContent();
+    }
 }

@@ -86,4 +86,16 @@ public class FollowCommandService {
 
         followRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
     }
+
+    /**
+     * 팔로우 관계 삭제
+     *
+     * @param followerId 삭제할 팔로워의 유저 ID
+     * @param followeeId 로그인 유저의 ID (팔로우 당하는 사람)
+     *
+     * 삭제 대상: followerId가 로그인 유저(followeeId)를 팔로우하고 있는 관계
+     */
+    public void removeFollower(Long followeeId, Long followerId) {
+        followRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
+    }
 }
