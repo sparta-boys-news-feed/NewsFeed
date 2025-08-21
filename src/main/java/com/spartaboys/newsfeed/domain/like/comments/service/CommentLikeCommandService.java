@@ -1,10 +1,10 @@
 package com.spartaboys.newsfeed.domain.like.comments.service;
 
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
-import com.spartaboys.newsfeed.domain.boards.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
-import com.spartaboys.newsfeed.domain.comments.service.CommentService;
+import com.spartaboys.newsfeed.domain.comments.service.CommentInternalService;
 import com.spartaboys.newsfeed.domain.like.comments.exception.CommentLikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.comments.exception.NotCommentOfBoardException;
 import com.spartaboys.newsfeed.domain.like.comments.repository.CommentLikeRepository;
@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentLikeCommandService {
 
     private final UserInternalService userInternalService;
-    private final BoardService boardService;
-    private final CommentService commentService;
+    private final BoardInternalService boardInternalService;
+    private final CommentInternalService commentInternalService;
 
     private final CommentLikeRepository commentLikeRepository;
 
@@ -51,8 +51,8 @@ public class CommentLikeCommandService {
      */
     public void likeComment(Long loginId, Long boardId, Long commentId) {
         User user = userInternalService.getUserObjectById(loginId);
-        Board board = boardService.getBoardById(boardId);
-        Comment comment = commentService.getCommentById(commentId);
+        Board board = boardInternalService.getBoardById(boardId);
+        Comment comment = commentInternalService.getCommentById(commentId);
 
         // 현재 댓글이 게시글 소유인지 검증
         if (!comment.isOwnedBy(board)) {
@@ -96,8 +96,8 @@ public class CommentLikeCommandService {
      */
     public void unlikeComment(Long loginId, Long boardId, Long commentId) {
         User user = userInternalService.getUserObjectById(loginId);
-        Board board = boardService.getBoardById(boardId);
-        Comment comment = commentService.getCommentById(commentId);
+        Board board = boardInternalService.getBoardById(boardId);
+        Comment comment = commentInternalService.getCommentById(commentId);
 
         // 사용자가 해당 댓글에 남긴 좋아요 조회
         CommentLike commentLike = commentLikeRepository.findByUserAndComment(user, comment)
