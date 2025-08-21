@@ -7,7 +7,6 @@ import com.spartaboys.newsfeed.domain.comments.dto.request.CommentUpdateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentGetAllResponse;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
-import com.spartaboys.newsfeed.domain.comments.exception.*;
 import com.spartaboys.newsfeed.domain.comments.mapper.CommentMapper;
 import com.spartaboys.newsfeed.domain.comments.repository.CommentRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
