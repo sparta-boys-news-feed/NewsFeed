@@ -60,8 +60,8 @@ public class CommentExternalService {
     @Transactional (readOnly = true)
     public Page<CommentGetAllResponse> getAllByBoardId(Long boardId, Pageable pageable) {
 
-        // 게시글 찾기
-        Board findBoard = boardInternalService.getBoardById(boardId);
+        // 게시글 검증 ( 객체 생성 X )
+        boardInternalService.getBoardById(boardId);
 
         // 일반 댓글만 페이징
         Page<Comment> pageComments = commentRepository.findByBoardIdAndParentCommentIsNullAndDeletedIsFalse(boardId, pageable);
@@ -83,14 +83,8 @@ public class CommentExternalService {
     @Transactional (readOnly = true)
     public CommentResponse getComment(Long boardId, Long commentId) {
 
-        // 해당 댓글 찾기
-        Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
-
-        // 해당 댓글이 삭제 되었는지 확인
-        findComment.validateCommentNotDeleted();
-
-        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
-        findComment.validateBoard(boardInternalService.getBoardById(boardId));
+        // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
+        Comment findComment = checkComment(commentId, boardId);
 
         // 해당 댓글 반환
         return commentMapper.toDto(findComment);
@@ -100,14 +94,8 @@ public class CommentExternalService {
     @Transactional
     public CommentResponse updateComment(Long boardId, Long commentId, User loginUser, CommentUpdateRequest request) {
 
-        // 해당 댓글 찾기
-        Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
-
-        // 해당 댓글이 삭제 되었는지 확인
-        findComment.validateCommentNotDeleted();
-
-        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
-        findComment.validateBoard(boardInternalService.getBoardById(boardId));
+        // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
+        Comment findComment = checkComment(commentId, boardId);
 
         // 유저의 권한 확인
         findComment.validateOwner(loginUser.getId());
@@ -123,19 +111,32 @@ public class CommentExternalService {
     @Transactional
     public void deleteComment(Long boardId, Long commentId, User loginUser) {
 
-        // 해당 댓글 찾기
-        Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
-
-        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
-        findComment.validateBoard(boardInternalService.getBoardById(boardId));
-
-        // 해당 댓글이 삭제 되었는지 확인
-        findComment.validateCommentNotDeleted();
+        // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
+        Comment findComment = checkComment(commentId, boardId);
 
         // 유저의 권한 확인
         findComment.validateOwner(loginUser.getId());
 
         // 해당 댓글 삭제 ( isDelete = true, deletedAt = LocalDateTime.now() )
         findComment.delete();
+    }
+
+
+
+
+
+
+    // ===== 헬퍼 메서드 =====
+
+    // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
+    private Comment checkComment(Long commentId, Long boardId) {
+        // 해당 댓글 찾기
+        Comment findComment = commentRepository.findByIdOrThrowElse(commentId);
+
+        // 해당 댓글이 삭제 되었는지 확인
+        findComment.validateCommentNotDeleted();
+
+        // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
+        findComment.validateBoard(boardInternalService.getBoardById(boardId));
     }
 }
