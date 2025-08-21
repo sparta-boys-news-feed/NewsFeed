@@ -1,12 +1,9 @@
 package com.spartaboys.newsfeed.domain.boards.service;
 
-import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.boards.exception.BoardErrorCode;
 import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
-import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
-import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,30 +16,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardInternalService {
 
     private final BoardRepository boardRepository;
-    private final BoardMapper boardMapper;
-    private final UserInternalService userInternalService;
 
-    // UserId로 유저의 모든 게시글 조회
-    public Page<BoardResponse> getBoardsByUserId(Pageable pageable,
-                                                 Long userId){
+    // UserId로 유저의 모든 게시글 조회 (Using At users)
+    public Page<Board> getBoardsByUserId(Pageable pageable,
+                                                 Long userId) {
 
         // pageable 조건을 기준으로 특정 user의 모든 게시글 조회
         Page<Board> boards = boardRepository.findAllByUserIdAndDeletedAtFalse(pageable, userId);
 
-        return boards.map(boardMapper::toDto);
+        return boards;
     }
 
-    // BoardId로 board 단건 조회
-    public Board getBoardById(Long boardId){
+    // BoardId로 board 단건 조회 (Using At like)
+    public Board getBoardById(Long boardId) {
 
         // BoardId 유효성 검증
         isBoardValid(boardId);
 
-        return boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        return boardRepository.findById(boardId).get();
     }
-    
+
     // BoardId 유효성 검증
-    public boolean isBoardValid(Long boardId){
-        return boardRepository.existsByIdAndDeletedIsFalse(boardId);
+    public void isBoardValid(Long boardId) {
+        if (!boardRepository.existsByIdAndDeletedIsFalse(boardId)) {
+            throw new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND);
+        }
+        ;
     }
 }
