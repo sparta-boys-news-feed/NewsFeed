@@ -25,6 +25,7 @@ public class UserInternalService {
         return userRepository.findAllByIdInAndDeletedIsFalse(userIDs);
     }
 
+    // TODO : 필요성 확인 및 제거 검토
     public boolean isUserValid(Long userID) {
         return userRepository.existsByIdAndDeletedIsFalse(userID);
     }

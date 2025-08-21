@@ -3,9 +3,9 @@ package com.spartaboys.newsfeed.domain.users.controller;
 import com.spartaboys.newsfeed.common.response.ApiPageResponse;
 import com.spartaboys.newsfeed.common.response.ApiResponse;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
-import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
-import com.spartaboys.newsfeed.domain.comments.entity.Comment;
+import com.spartaboys.newsfeed.domain.follow.dto.FollowerResponse;
+import com.spartaboys.newsfeed.domain.follow.dto.FollowingResponse;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
 import com.spartaboys.newsfeed.domain.users.dto.request.UserUpdateRequest;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPrivateResponse;
@@ -18,9 +18,10 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,24 +65,42 @@ public class UserController {
 
     @GetMapping("/{userId}/boards")
     public ResponseEntity<ApiPageResponse<BoardResponse>> getBoardsByUserId(
-            @PathVariable Long userId,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long userId
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
+        Page<BoardResponse> page = userService.getBoardsByUserId(pageable, userId);
 
-        return ApiPageResponse.success(userService.getBoardsByUserId(pageable, userId));
+        return ApiPageResponse.success(page);
     }
 
     @GetMapping("/{userId}/comments")
-    public ResponseEntity<ApiPageResponse<CommentResponse>> getCommentssByUserId(
-            @PathVariable Long userId,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+    public ResponseEntity<ApiPageResponse<CommentResponse>> getCommentsByUserId(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long userId
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.sort(Comment.class).by(Comment::getCreatedAt).descending());
+        Page<CommentResponse> page = userService.getCommentsByUserId(pageable, userId);
 
-        return ApiPageResponse.success(userService.getCommentsByUserId(pageable, userId));
+        return ApiPageResponse.success(page);
+    }
+
+    @GetMapping("/{userId}/followers")
+    public ResponseEntity<ApiPageResponse<FollowerResponse>> getFollowersByUserId(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long userId
+    ) {
+        Page<FollowerResponse> page = userService.getFollowersFromUserId(pageable, userId);
+
+        return ApiPageResponse.success(page);
+    }
+
+    @GetMapping("/{userId}/followees")
+    public ResponseEntity<ApiPageResponse<FollowingResponse>> getFolloweesByUserId(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long userId
+    ) {
+        Page<FollowingResponse> page = userService.getFolloweesFromUserId(pageable, userId);
+
+        return ApiPageResponse.success(page);
     }
 
     // TODO: 임의로 세션을 통해 구현 (추후 로직 변경 시 반영)
@@ -122,22 +141,40 @@ public class UserController {
     @GetMapping("/me/boards")
     public ResponseEntity<ApiPageResponse<BoardResponse>> getBoardsByMe(
             HttpSession session,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
+        Page<BoardResponse> page = userService.getBoardsByUserId(pageable, getUserIdFromSession(session));
 
-        return ApiPageResponse.success(userService.getBoardsByUserId(pageable, getUserIdFromSession(session)));
+        return ApiPageResponse.success(page);
     }
 
     @GetMapping("/me/comments")
     public ResponseEntity<ApiPageResponse<CommentResponse>> getCommentsByMe(
             HttpSession session,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.sort(Comment.class).by(Comment::getCreatedAt).descending());
+        Page<CommentResponse> page = userService.getCommentsByUserId(pageable, getUserIdFromSession(session));
 
-        return ApiPageResponse.success(userService.getCommentsByUserId(pageable, getUserIdFromSession(session)));
+        return ApiPageResponse.success(page);
+    }
+
+    @GetMapping("/me/followers")
+    public ResponseEntity<ApiPageResponse<FollowerResponse>> getFollowersByMe(
+            HttpSession session,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<FollowerResponse> page = userService.getFollowersFromUserId(pageable, getUserIdFromSession(session));
+
+        return ApiPageResponse.success(page);
+    }
+
+    @GetMapping("/me/followees")
+    public ResponseEntity<ApiPageResponse<FollowingResponse>> getFolloweesByUserId(
+            HttpSession session,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<FollowingResponse> page = userService.getFolloweesFromUserId(pageable, getUserIdFromSession(session));
+
+        return ApiPageResponse.success(page);
     }
 }
