@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -17,6 +19,10 @@ public class UserInternalService {
     public User getUserObjectById(Long userID) {
         return userRepository.findByIdAndDeletedIsFalse(userID)
                 .orElseThrow(() -> new InvalidUserException(UserErrorCode.USR_INVALID_ID));
+    }
+
+    public List<User> getUserObjectsByIdList(List<Long> userIDs) {
+        return userRepository.findAllByIdInAndDeletedIsFalse(userIDs);
     }
 
     public boolean isUserValid(Long userID) {
