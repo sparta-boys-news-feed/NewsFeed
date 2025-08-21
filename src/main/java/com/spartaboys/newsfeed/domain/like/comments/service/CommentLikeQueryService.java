@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentLikeQueryService {
 
-    private final UserService userService;
+    private final UserInternalService userInternalService;
     private final BoardService boardService;
     private final CommentService commentService;
 
@@ -50,7 +50,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void likeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
@@ -96,7 +96,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void unlikeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
