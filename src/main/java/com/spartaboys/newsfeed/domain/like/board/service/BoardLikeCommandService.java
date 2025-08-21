@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.board.service;
 
-import com.spartaboys.newsfeed.domain.board.entity.Board;
-import com.spartaboys.newsfeed.domain.board.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.like.board.exception.BoardLikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.board.repository.BoardLikeRepository;
 import com.spartaboys.newsfeed.domain.like.entity.BoardLike;
@@ -10,16 +10,17 @@ import com.spartaboys.newsfeed.domain.like.exception.LikeAccessDeniedException;
 import com.spartaboys.newsfeed.domain.like.exception.LikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.exception.LikeNotFoundException;
 import com.spartaboys.newsfeed.domain.users.entity.User;
-import com.spartaboys.newsfeed.domain.users.service.UserService;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BoardLikeQueryService {
+@Transactional
+public class BoardLikeCommandService {
 
-    private final UserService userService;
+    private final UserInternalService userInternalService;
     private final BoardService boardService;
 
     private final BoardLikeRepository boardLikeRepository;
@@ -35,9 +36,8 @@ public class BoardLikeQueryService {
      * @param boardId 좋아요가 눌린 게시글 ID
      * @throws IllegalStateException 사용자가 이미 같은 게시글에 좋아요를 눌렀을 경우 발생
      */
-    @Transactional
     public void likeBoard(Long loginId, Long boardId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
 
         // 좋아요 중복 방지
@@ -68,9 +68,8 @@ public class BoardLikeQueryService {
      * @throws LikeNotFoundException     사용자가 해당 게시글에 좋아요를 누르지 않은 경우
      * @throws LikeAccessDeniedException 좋아요 작성자가 아닌 사용자가 삭제를 시도한 경우
      */
-    @Transactional
     public void unlikeBoard(long loginId, Long boardId) {
-        User user = userService.getUserObjectById(loginId);
+        User user = userInternalService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
 
         BoardLike boardLike = boardLikeRepository.findByUserAndBoard(user, board)

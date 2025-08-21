@@ -6,13 +6,14 @@ import com.spartaboys.newsfeed.domain.comments.dto.request.CommentCreateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.request.CommentUpdateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentGetAllResponse;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
-import com.spartaboys.newsfeed.domain.comments.service.CommentService;
+import com.spartaboys.newsfeed.domain.comments.service.CommentExternalService;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/boards/{boardId}/comments")
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentExternalService commentExternalService;
 
     @PostMapping("/{commentId}")
     public ResponseEntity<ApiResponse<CommentResponse>> createComment(
@@ -31,7 +32,7 @@ public class CommentController {
             @Valid @RequestBody CommentCreateRequest commentRequest
     ) {
 
-        CommentResponse response = commentService.createComment(boardId, commentId, loginUser, commentRequest);
+        CommentResponse response = commentExternalService.createComment(boardId, commentId, loginUser, commentRequest);
 
         return ApiResponse.created(response);
     }
@@ -39,13 +40,10 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<ApiPageResponse<CommentGetAllResponse>> getAllByBoardId(
             @PathVariable Long boardId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @PageableDefault (page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
     ) {
-        // 페이지 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
 
-        Page<CommentGetAllResponse> response = commentService.getAllByBoardId(boardId, pageable);
+        Page<CommentGetAllResponse> response = commentExternalService.getAllByBoardId(boardId, pageable);
 
         return ApiPageResponse.success(response);
     }
@@ -56,7 +54,7 @@ public class CommentController {
             @PathVariable Long commentId
     ) {
 
-        CommentResponse response = commentService.getComment(boardId, commentId);
+        CommentResponse response = commentExternalService.getComment(boardId, commentId);
 
         return ApiResponse.success(response);
     }
@@ -69,7 +67,7 @@ public class CommentController {
             @Valid @RequestBody CommentUpdateRequest commentRequest
     ) {
 
-        CommentResponse response = commentService.updateComment(boardId, commentId, loginUser, commentRequest);
+        CommentResponse response = commentExternalService.updateComment(boardId, commentId, loginUser, commentRequest);
 
         return ApiResponse.success(response);
     }
@@ -80,6 +78,6 @@ public class CommentController {
             @PathVariable Long commentId,
             @SessionAttribute("user") User loginUser
     ) {
-        commentService.deleteComment(boardId, commentId, loginUser);
+        commentExternalService.deleteComment(boardId, commentId, loginUser);
     }
 }

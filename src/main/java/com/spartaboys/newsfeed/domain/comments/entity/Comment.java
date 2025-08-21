@@ -51,30 +51,28 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
+    // 댓글이 삭제 되었는지 검증
     public void validateCommentNotDeleted() {
         if (isDeleted()) {
             throw new InvalidCommentException(CommentErrorCode.COMMENT_NOT_FOUND);
         }
     }
 
-    public void validateBoardNotDeleted() {
-        if (board.isDeleted()) {
-            throw new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND);
-        }
-    }
-
+    // 댓글의 게시글 ID 와 받은 게시글 ID 가 같은지 검증
     public void validateBoard(Board board) {
         if (!board.getId().equals(this.board.getId())) {
             throw new InvalidCommentException(CommentErrorCode.NOT_COMMENT_OF_BOARD);
         }
     }
 
+    // 댓글 작성자인지 검증
     public void validateOwner(Long userId) {
         if (!this.user.getId().equals(userId)) {
             throw new InvalidCommentException(CommentErrorCode.FORBIDDEN_COMMENT_ACCESS);
         }
     }
 
+    // 댓글에 대댓글 달려고 하는지 검증 ( 대댓글은 한번만 )
     public void validateHaveReply() {
         if (this.parentComment != null) {
             throw new InvalidCommentException(CommentErrorCode.REPLY_BAD_REQUEST);
