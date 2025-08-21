@@ -50,7 +50,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void likeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
@@ -96,7 +96,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void unlikeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
