@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.follow.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiResponse;
-import com.spartaboys.newsfeed.domain.follow.service.FollowCommandService;
+import com.spartaboys.newsfeed.domain.follow.service.external.FollowCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

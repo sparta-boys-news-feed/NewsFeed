@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.board.service;
 
-import com.spartaboys.newsfeed.domain.board.entity.Board;
-import com.spartaboys.newsfeed.domain.board.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.like.board.exception.BoardLikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.board.repository.BoardLikeRepository;
 import com.spartaboys.newsfeed.domain.like.entity.BoardLike;
@@ -10,7 +10,7 @@ import com.spartaboys.newsfeed.domain.like.exception.LikeAccessDeniedException;
 import com.spartaboys.newsfeed.domain.like.exception.LikeErrorCode;
 import com.spartaboys.newsfeed.domain.like.exception.LikeNotFoundException;
 import com.spartaboys.newsfeed.domain.users.entity.User;
-import com.spartaboys.newsfeed.domain.users.service.UserService;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
