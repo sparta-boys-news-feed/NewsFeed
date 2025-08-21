@@ -2,6 +2,7 @@ package com.spartaboys.newsfeed.domain.follow.service.internal;
 
 import com.spartaboys.newsfeed.domain.follow.entity.Follow;
 import com.spartaboys.newsfeed.domain.follow.exception.FollowErrorCode;
+import com.spartaboys.newsfeed.domain.follow.exception.FollowNotFoundException;
 import com.spartaboys.newsfeed.domain.follow.repository.FollowRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
