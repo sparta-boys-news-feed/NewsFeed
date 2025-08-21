@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.board.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiResponse;
-import com.spartaboys.newsfeed.domain.like.board.service.BoardLikeQueryService;
+import com.spartaboys.newsfeed.domain.like.board.service.BoardLikeCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class BoardLikeController {
 
-    private final BoardLikeQueryService boardLikeQueryService;
+    private final BoardLikeCommandService boardLikeCommandService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> likeBoard(
             @SessionAttribute(name = "login_id") Long loginId,
             @PathVariable Long boardId
     ) {
-        boardLikeQueryService.likeBoard(loginId, boardId);
+        boardLikeCommandService.likeBoard(loginId, boardId);
         return ApiResponse.noContent();
     }
 
@@ -27,7 +27,7 @@ public class BoardLikeController {
             @SessionAttribute(name = "login_id") Long loginId,
             @PathVariable Long boardId
     ) {
-        boardLikeQueryService.unlikeBoard(loginId, boardId);
+        boardLikeCommandService.unlikeBoard(loginId, boardId);
         return ApiResponse.noContent();
     }
 
