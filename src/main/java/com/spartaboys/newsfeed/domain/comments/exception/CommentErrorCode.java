@@ -14,10 +14,8 @@ public enum CommentErrorCode implements ErrorCode {
     FORBIDDEN_COMMENT_ACCESS("CMT-001", HttpStatus.FORBIDDEN, "해당 댓글에 대한 권한이 없습니다."),
 
     // 1XX 없는 게시물 or 댓글 조회
-    // 게시글이 없을 때 (혹은 삭제 됐을 때) NOT_FOUND
-    BOARD_NOT_FOUND("CMT-100",HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
     // 댓글을 찾을 수 없을 때 NOT_FOUND
-    COMMENT_NOT_FOUND("CMT-101",HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND("CMT-100",HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
 
     // 2XX 잘못된 요청
     // 요청된 게시물 ID 가 해당 댓글의 게시물 ID와 다를 때

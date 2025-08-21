@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.domain.comments.service;
 
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
 import com.spartaboys.newsfeed.domain.comments.dto.request.CommentCreateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.request.CommentUpdateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentGetAllResponse;
@@ -138,5 +139,7 @@ public class CommentExternalService {
 
         // 해당 게시글이 댓글 게시글 ID와 동일한지 확인
         findComment.validateBoard(boardInternalService.getBoardById(boardId));
+
+        return findComment;
     }
 }
