@@ -1,11 +1,16 @@
 package com.spartaboys.newsfeed.domain.users.service;
 
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
-import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
-import com.spartaboys.newsfeed.domain.boards.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
+import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.mapper.CommentMapper;
-import com.spartaboys.newsfeed.domain.comments.service.CommentService;
+import com.spartaboys.newsfeed.domain.comments.service.CommentInternalService;
+import com.spartaboys.newsfeed.domain.follow.dto.FollowerResponse;
+import com.spartaboys.newsfeed.domain.follow.dto.FollowingResponse;
+import com.spartaboys.newsfeed.domain.follow.entity.Follow;
+import com.spartaboys.newsfeed.domain.follow.mapper.FollowMapper;
+import com.spartaboys.newsfeed.domain.follow.service.internal.FollowInternalService;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
 import com.spartaboys.newsfeed.domain.users.dto.request.UserUpdateRequest;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPrivateResponse;
@@ -32,10 +37,11 @@ import java.util.stream.Collectors;
 public class UserExternalService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
-    private final BoardService boardService;
-    private final CommentService commentService;
-    private final BoardMapper boardMapper;
+    private final BoardInternalService boardInternalService;
+    private final CommentInternalService commentInternalService;
     private final CommentMapper commentMapper;
+    private final FollowInternalService followInternalService;
+    private final FollowMapper followMapper;
 
     // 헬퍼 메서드
     private User getUserOrThrow(Long id) {
@@ -99,21 +105,42 @@ public class UserExternalService {
     public Page<BoardResponse> getBoardsByUserId(Pageable pageable, Long userId) {
         User targetUser = getUserOrThrow(userId);
 
-        // TODO : 연동 메소드 확인
-//        Page<Board> boards = boardService.getBoardsByUserID(pageable, targetUser.getId());
-//
-//        return boards.map(boardMapper::toDto);
-        return null;
+
+        return boardInternalService.getBoardsByUserId(pageable, targetUser.getId());
     }
 
     public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
         User targetUser = getUserOrThrow(userId);
 
-        // TODO : 연동 메소드 확인
-//        Page<Comment> comments = commentService.getCommentsByUserID(pageable, targetUser.getId());
-//
-//        return comments.map(commentMapper::toDto);
-        return null;
+        Page<Comment> comments = commentInternalService.getCommentsByUserId(targetUser.getId(), pageable);
+
+        return comments.map(commentMapper::toDto);
+    }
+
+    //  특정 대상이 follow한 사람 목록
+    public Page<FollowerResponse> getFollowersFromUserId(Pageable pageable, Long userId) {
+        User targetUser = getUserOrThrow(userId);
+
+        // 1. target이 팔로우 중인 user에 대한 Follow 인스턴스 목록 조회
+        // 2. 인스턴스 목록에서 followee 필드 따로 분리
+        // 3. 분리한 followee(user)와 isFollowing 여부에 따라 FollowerResponse 생성)
+        return followInternalService.getFollowersByUserId(targetUser.getId(), pageable)
+                .map(Follow::getFollowee)
+                .map(user -> followMapper.toDto(user, followInternalService.isFollowing(targetUser.getId(), user.getId())));
+
+    }
+
+    // 불특정 다수가 특정 대상을 follow 했을 때, 불특정 다수의 목록
+    public Page<FollowingResponse> getFolloweesFromUserId(Pageable pageable, Long userId) {
+        User targetUser = getUserOrThrow(userId);
+
+        // 1. target을 팔로우 중인 user에 대한 Follow 인스턴스 목록 조회
+        // 2. 인스턴스 목록에서 follower 필드 따로 분리
+        // 3. 분리한 follower(user)로 매핑
+        return followInternalService.getFolloweesByUserId(targetUser.getId(), pageable)
+                .map(Follow::getFollower)
+                .map(followMapper::toDto);
+
     }
 
     // public Page<>
