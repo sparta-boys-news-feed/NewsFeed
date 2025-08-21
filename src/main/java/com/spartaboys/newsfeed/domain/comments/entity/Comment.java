@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.comments.entity;
 
 import com.spartaboys.newsfeed.common.entity.BaseEntity;
-import com.spartaboys.newsfeed.domain.board.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
 import com.spartaboys.newsfeed.domain.comments.exception.InvalidCommentException;
 import com.spartaboys.newsfeed.domain.like.exception.CannotDecreaseLikesException;
@@ -40,10 +40,11 @@ public class Comment extends BaseEntity {
     private Comment parentComment;
 
     @Builder
-    public Comment(String content, Board board, User user) {
+    public Comment(String content, Board board, User user, Comment parentComment) {
         this.content = content;
         this.board = board;
         this.user = user;
+        this.parentComment = parentComment;
     }
 
     public void updateContent(String content) {
@@ -64,13 +65,19 @@ public class Comment extends BaseEntity {
 
     public void validateBoard(Board board) {
         if (!board.getId().equals(this.board.getId())) {
-            throw new InvalidCommentException(CommentErrorCode.BOARD_BAD_REQUEST);
+            throw new InvalidCommentException(CommentErrorCode.NOT_COMMENT_OF_BOARD);
         }
     }
 
     public void validateOwner(Long userId) {
         if (!this.user.getId().equals(userId)) {
-            throw new InvalidCommentException(CommentErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
+            throw new InvalidCommentException(CommentErrorCode.FORBIDDEN_COMMENT_ACCESS);
+        }
+    }
+
+    public void validateHaveReply() {
+        if (this.parentComment != null) {
+            throw new InvalidCommentException(CommentErrorCode.REPLY_BAD_REQUEST);
         }
     }
 

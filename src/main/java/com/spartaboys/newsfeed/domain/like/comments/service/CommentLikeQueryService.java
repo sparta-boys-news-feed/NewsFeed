@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.comments.service;
 
-import com.spartaboys.newsfeed.domain.board.entity.Board;
-import com.spartaboys.newsfeed.domain.board.service.BoardService;
+import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.exception.CommentErrorCode;
 import com.spartaboys.newsfeed.domain.comments.service.CommentService;
@@ -50,7 +50,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void likeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 
@@ -96,7 +96,7 @@ public class CommentLikeQueryService {
      */
     @Transactional
     public void unlikeComment(Long loginId, Long boardId, Long commentId) {
-        User user = userService.getUserById(loginId);
+        User user = userService.getUserObjectById(loginId);
         Board board = boardService.getBoardById(boardId);
         Comment comment = commentService.getCommentById(commentId);
 

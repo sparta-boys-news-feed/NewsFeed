@@ -4,6 +4,7 @@ import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.boards.service.BoardService;
 import com.spartaboys.newsfeed.domain.comments.dto.request.CommentCreateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.request.CommentUpdateRequest;
+import com.spartaboys.newsfeed.domain.comments.dto.response.CommentGetAllResponse;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.exception.*;
@@ -16,6 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -27,7 +32,7 @@ public class CommentService {
 
     // 댓글 생성
     @Transactional
-    public CommentResponse createComment(Long boardId, User loginUser, CommentCreateRequest request) {
+    public CommentResponse createComment(Long boardId, Long commentId, User loginUser, CommentCreateRequest request) {
 
         // 게시글 찾아오기
         Board findBoard = boardService.getBoardById(boardId);
@@ -36,7 +41,17 @@ public class CommentService {
         checkBoardIsDelete(findBoard);
 
         // 댓글 생성
-        Comment comment = commentMapper.toEntity(request, findBoard, loginUser);
+        Comment comment;
+        if (commentId == null) {
+            // 일반 댓글
+            comment = commentMapper.toEntity(request, findBoard, loginUser, null);
+        } else {
+            // 대댓글 (부모 댓글 조회 후 삭제 및 부모 댓글 여부 체크)
+            Comment parentComment = commentRepository.findByIdOrThrowElse(commentId);
+            parentComment.validateCommentNotDeleted();
+            parentComment.validateHaveReply();
+            comment = commentMapper.toEntity(request, findBoard, loginUser, parentComment);
+        }
 
         // 댓글 저장
         commentRepository.save(comment);
@@ -47,7 +62,7 @@ public class CommentService {
 
     // 댓글 전체 조회 (해당 게시글)
     @Transactional (readOnly = true)
-    public Page<CommentResponse> getAllByBoardId(Long boardId, Pageable pageable) {
+    public Page<CommentGetAllResponse> getAllByBoardId(Long boardId, Pageable pageable) {
 
         // 게시글 찾기
         Board findBoard = boardService.getBoardById(boardId);
@@ -55,11 +70,20 @@ public class CommentService {
         // 해당 게시글이 삭제 되었는지 확인
         checkBoardIsDelete(findBoard);
 
-        // 해당 게시글의 댓글들 가져와서 페이징 조회
-        Page<Comment> pageComments = commentRepository.findAllByBoardIdOrderByCreatedAtDesc(boardId, pageable);
+        // 일반 댓글만 페이징
+        Page<Comment> pageComments = commentRepository.findByBoardIdAndParentCommentIsNullOrderByCreatedAtDesc(boardId, pageable);
 
-        // 페이지 DTO 변환 및 반환
-        return commentMapper.toDto(pageComments);
+        // 해당 게시물의 대댓글 모두 조회
+        List<Comment> allReplies = commentRepository.findByBoardIdAndParentCommentIsNotNull(boardId);
+
+        // 부모 댓글 ID 기준으로 대댓글 그룹화
+        Map<Long, List<Comment>> repliesMap = allReplies.stream()
+                .collect(Collectors.groupingBy(reply -> reply.getParentComment().getId()));
+
+        // 부모 댓글 + 대댓글 매핑
+        return pageComments.map(parent ->
+                commentMapper.toDto(parent, repliesMap.getOrDefault(parent.getId(), List.of()))
+        );
     }
 
     // 댓글 단일 조회
@@ -143,5 +167,9 @@ public class CommentService {
         if (board.isDeleted()) {
             throw new InvalidCommentException(CommentErrorCode.BOARD_NOT_FOUND);
         }
+    }
+
+    public Comment getCommentById(Long commentId) {
+        return commentRepository.findByIdOrThrowElse(commentId);
     }
 }
