@@ -1,5 +1,6 @@
 package com.spartaboys.newsfeed.domain.users.service;
 
+import com.spartaboys.newsfeed.domain.auth.PasswordEncoder;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
 import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserExternalService {
+    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final BoardInternalService boardInternalService;
@@ -89,17 +91,16 @@ public class UserExternalService {
 
     @Transactional
     public void updateUserPassword(Long id, ChangePasswordRequest dto) {
-        // TODO : 비밀번호 암호화 로직 완성되는대로 반영
         if (dto.getNewPasswordConfirm().equals(dto.getNewPassword())) {
             throw new InvalidUserException(UserErrorCode.USR_PW_CHECK_MISMATCH);
         }
 
         User currentUser = getUserOrThrow(id);
-        if (!currentUser.getPassword().equals(dto.getCurrentPassword())) {
+        if (!passwordEncoder.matches(dto.getNewPassword(), currentUser.getPassword())) {
             throw new InvalidUserException(UserErrorCode.USR_PW_CURRENT_MISMATCH);
         }
 
-        currentUser.updatePassword(dto.getNewPassword());
+        currentUser.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
     }
 
     public Page<BoardResponse> getBoardsByUserId(Pageable pageable, Long userId) {
