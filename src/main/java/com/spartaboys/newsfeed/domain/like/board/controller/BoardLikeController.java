@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.board.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiResponse;
-import com.spartaboys.newsfeed.domain.like.board.service.BoardLikeCommandService;
+import com.spartaboys.newsfeed.domain.like.board.service.external.BoardLikeCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
