@@ -25,9 +25,11 @@ public class BoardExternalService {
 
     @Transactional
     public BoardResponse getBoardByUserId(BoardRequest request,
-                                          User loginUser) {
+                                          Long loginUserID) {
+        User user = userInternalService.getUserObjectById(loginUserID);
+
         // DB에 게시글 저장
-        Board board = boardRepository.save(boardMapper.toEntity(request, loginUser));
+        Board board = boardRepository.save(boardMapper.toEntity(request, user));
 
         return boardMapper.toDto(board);
     }
@@ -68,12 +70,12 @@ public class BoardExternalService {
     }
 
     @Transactional
-    public BoardResponse updateBoardDetailsByBoardId(Long boardId, User loginUser, BoardRequest request) {
+    public BoardResponse updateBoardDetailsByBoardId(Long boardId, Long loginUserId, BoardRequest request) {
 
         Board board = isBoardNullOrDeleted(boardId);
 
         // boardId 작성자 Id와 로그인 유저의 Id가 다를 경우 예외처리
-        if(!isSameUserId(loginUser, board.getUser())) throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
+        if(!isSameUserId(loginUserId, board.getUser().getId())) throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
 
 
         // 게시글 수정사항 반영
@@ -83,18 +85,18 @@ public class BoardExternalService {
     }
 
     @Transactional
-    public void deleteBoardByBoardId(Long boardId, User loginUser) {
+    public void deleteBoardByBoardId(Long boardId, Long loginUserId) {
 
         Board board = isBoardNullOrDeleted(boardId);
         // boardId 작성자 Id와 로그인 유저의 Id가 다를 경우 예외처리
-        if (!isSameUserId(loginUser, board.getUser())) throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
+        if (!isSameUserId(loginUserId, board.getUser().getId())) throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
 
         boardRepository.deleteById(boardId);
     }
 
     // LoginUser와 Board를 작성한 User가 같은지 검증(QUESTION: Board에서 Update 로직을 수행하지만 정작 다른 정보인 것은 User면 User의 Exception을 써야하나요 아니면 Board의 Exception에 예외 사항을 새로 추가해야하나요?)
-    public boolean isSameUserId(User loginUser, User boardUser){
-        return loginUser.getId().equals(boardUser.getId());
+    public boolean isSameUserId(Long loginUserId, Long boardUserId){
+        return loginUserId.equals(boardUserId);
     }
 
     // boardId가 존재하지만 삭제됐을 경우 예외처리
