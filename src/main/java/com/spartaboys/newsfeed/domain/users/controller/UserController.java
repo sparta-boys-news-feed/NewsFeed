@@ -2,10 +2,12 @@ package com.spartaboys.newsfeed.domain.users.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiPageResponse;
 import com.spartaboys.newsfeed.common.response.ApiResponse;
+import com.spartaboys.newsfeed.domain.auth.JwtTokenUtil;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
 import com.spartaboys.newsfeed.domain.follow.dto.FollowerResponse;
 import com.spartaboys.newsfeed.domain.follow.dto.FollowingResponse;
+import com.spartaboys.newsfeed.domain.like.dto.LikeResponse;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
 import com.spartaboys.newsfeed.domain.users.dto.request.UserUpdateRequest;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPrivateResponse;
@@ -14,6 +16,7 @@ import com.spartaboys.newsfeed.domain.users.dto.response.UserUpdateResponse;
 import com.spartaboys.newsfeed.domain.users.exception.InvalidUserException;
 import com.spartaboys.newsfeed.domain.users.exception.UserErrorCode;
 import com.spartaboys.newsfeed.domain.users.service.UserExternalService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +38,14 @@ import java.util.List;
 public class UserController {
     private final UserExternalService userService;
 
-    private Long getUserIdFromSession(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            throw new InvalidUserException(UserErrorCode.USR_UNAUTHORIZED);
-        }
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        // TODO : Temp 사용이므로 추후 꼭 수정할것!
+        String secretKey = "super-secret-key-change-me-32bytes-minimum-aaaaaaaaaaaa";
 
-        return userId;
+        return Long.valueOf(JwtTokenUtil.getLoginId(
+                request.getHeader(HttpHeaders.AUTHORIZATION).substring(7),
+                secretKey));
+
     }
 
     @GetMapping("/search")
@@ -106,10 +111,10 @@ public class UserController {
     // TODO: 임의로 세션을 통해 구현 (추후 로직 변경 시 반영)
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserPrivateResponse>> getCurrentUser(
-            HttpSession session
+            HttpServletRequest request
     ) {
         UserPrivateResponse privateUserInfo = userService.getPrivateUserById(
-                getUserIdFromSession(session)
+                getUserIdFromRequest(request)
         );
 
         return ApiResponse.success(privateUserInfo);
@@ -117,11 +122,11 @@ public class UserController {
 
     @PatchMapping("/me")
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateCurrentUser(
-            HttpSession session,
+            HttpServletRequest request,
             @Valid @RequestBody UserUpdateRequest dto
     ) {
         UserUpdateResponse updateUserInfo = userService.updateUserProfile(
-                getUserIdFromSession(session), dto
+                getUserIdFromRequest(request), dto
         );
 
         return ApiResponse.success(updateUserInfo);
@@ -129,10 +134,10 @@ public class UserController {
 
     @PatchMapping("/me/password")
     public ResponseEntity<ApiResponse<Void>> updatePassword(
-            HttpSession session,
+            HttpServletRequest request,
             @Valid @RequestBody ChangePasswordRequest dto
     ) {
-        userService.updateUserPassword(getUserIdFromSession(session), dto);
+        userService.updateUserPassword(getUserIdFromRequest(request), dto);
 
         return ApiResponse.noContent();
     }
@@ -140,41 +145,52 @@ public class UserController {
 
     @GetMapping("/me/boards")
     public ResponseEntity<ApiPageResponse<BoardResponse>> getBoardsByMe(
-            HttpSession session,
+            HttpServletRequest request,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<BoardResponse> page = userService.getBoardsByUserId(pageable, getUserIdFromSession(session));
+        Page<BoardResponse> page = userService.getBoardsByUserId(pageable, getUserIdFromRequest(request));
 
         return ApiPageResponse.success(page);
     }
 
     @GetMapping("/me/comments")
     public ResponseEntity<ApiPageResponse<CommentResponse>> getCommentsByMe(
-            HttpSession session,
+            HttpServletRequest request,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<CommentResponse> page = userService.getCommentsByUserId(pageable, getUserIdFromSession(session));
+        Page<CommentResponse> page = userService.getCommentsByUserId(pageable, getUserIdFromRequest(request));
 
         return ApiPageResponse.success(page);
     }
 
     @GetMapping("/me/followers")
     public ResponseEntity<ApiPageResponse<FollowerResponse>> getFollowersByMe(
-            HttpSession session,
+            HttpServletRequest request,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<FollowerResponse> page = userService.getFollowersFromUserId(pageable, getUserIdFromSession(session));
+        Page<FollowerResponse> page = userService.getFollowersFromUserId(pageable, getUserIdFromRequest(request));
 
         return ApiPageResponse.success(page);
     }
 
     @GetMapping("/me/followees")
     public ResponseEntity<ApiPageResponse<FollowingResponse>> getFolloweesByUserId(
-            HttpSession session,
+            HttpServletRequest request,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<FollowingResponse> page = userService.getFolloweesFromUserId(pageable, getUserIdFromSession(session));
+        Page<FollowingResponse> page = userService.getFolloweesFromUserId(pageable, getUserIdFromRequest(request));
 
         return ApiPageResponse.success(page);
+    }
+
+    // board: 게시글 | comment: 댓글 | all(or 다른값): 전체
+    @GetMapping("/me/likes")
+    public ResponseEntity<ApiResponse<List<LikeResponse>>> getLikesByUserId(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "all") String target
+    ) {
+        List<LikeResponse> likes = userService.getLikesFromUserId(getUserIdFromRequest(request), target);
+
+        return ApiResponse.success(likes);
     }
 }
