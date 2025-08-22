@@ -24,13 +24,13 @@ public enum LikeType {
         return switch (target) {
             case "board" -> BOARD;
             case "comment" -> COMMENT;
-            default -> ALL; // 나머지는 전부 C
+            default -> ALL; // 나머지는 전부 ALL
         };
     }
 
     public Stream<Like> select(List<BoardLike> boards, List<CommentLike> comments) {
-        Stream<Like> boardStream   = boards.stream().map(b -> (Like) b);
-        Stream<Like> commentStream = comments.stream().map(c -> (Like) c);
+        Stream<Like> boardStream   = boards.stream().map(boardLike -> (Like) boardLike);
+        Stream<Like> commentStream = comments.stream().map(commentLike -> (Like) commentLike);
         return switch (this) {
             case BOARD   -> boardStream;
             case COMMENT -> commentStream;
