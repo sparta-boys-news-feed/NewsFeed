@@ -8,6 +8,7 @@ import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ public class BoardExternalService {
 
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
+    private final UserInternalService userInternalService;
 
 
     @Transactional
