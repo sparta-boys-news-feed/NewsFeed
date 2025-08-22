@@ -101,7 +101,7 @@ public class CommentExternalService {
         findComment.validateOwner(loginUser.getId());
 
         // 댓글 내용 수정
-        findComment.updateContent(request.getContent());
+        findComment.updateContent(request.content());
 
         // 수정된 내용 반환
         return commentMapper.toDto(findComment);

@@ -16,7 +16,7 @@ public class CommentMapper {
     // CommentCreateRequest DTO를 Comment 엔티티로 변환
     public Comment toEntity(CommentCreateRequest request, Board board, User user, Comment parentComment) {
         return Comment.builder()
-                .content(request.getContent())
+                .content(request.content())
                 .user(user)
                 .board(board)
                 .parentComment(parentComment)
@@ -24,14 +24,14 @@ public class CommentMapper {
     }
 
     // 부모 댓글 -> DTO (대댓글 리스트 포함)
-    public CommentGetAllResponse toDto(Comment parent, List<Comment> replies) {
+    public CommentGetAllResponse toDto(Comment comment, List<Comment> replies) {
         return CommentGetAllResponse.builder()
-                .id(parent.getId())
-                .content(parent.getContent())
-                .nickname(parent.getUser().getNickname())
-                .likes(parent.getLikes())
-                .createdAt(parent.getCreatedAt())
-                .updatedAt(parent.getUpdatedAt())
+                .id(comment.getId())
+                .content(comment.getContent())
+                .nickname(comment.getUser().getNickname())
+                .likes(comment.getLikes())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
                 .replies(toDto(replies)) // 대댓글 변환
                 .build();
     }
