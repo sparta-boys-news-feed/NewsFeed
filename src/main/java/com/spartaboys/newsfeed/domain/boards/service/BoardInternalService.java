@@ -33,15 +33,19 @@ public class BoardInternalService {
     // BoardId로 board 단건 조회
     public Board getBoardById(Long boardId){
 
-        // BoardId 유효성 검증
-        isBoardValid(boardId);
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
-        return boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        // BoardId 유효성 검증
+        if(isBoardNotValid(boardId)){
+            throw new InvalidBoardException(BoardErrorCode.BOARD_ALREADY_DELETED);
+        }
+
+        return board;
     }
 
     // 헬퍼 메서드
     // BoardId 유효성 검증
-    public boolean isBoardValid(Long boardId){
-        return boardRepository.existsByIdAndDeletedIsFalse(boardId);
+    public boolean isBoardNotValid(Long boardId){
+        return !boardRepository.existsByIdAndDeletedIsFalse(boardId);
     }
 }

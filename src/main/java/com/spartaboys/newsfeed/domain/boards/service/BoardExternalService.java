@@ -77,7 +77,7 @@ public class BoardExternalService {
         Board board = isBoardNullOrDeleted(boardId);
 
         // boardId 작성자 Id와 로그인 유저의 Id가 다를 경우 예외처리
-        if (!isSameUserId(loginUserId, board.getUser().getId())) {
+        if (isNotSameUserId(loginUserId, board.getUser().getId())) {
             throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
         }
 
@@ -92,7 +92,7 @@ public class BoardExternalService {
 
         Board board = isBoardNullOrDeleted(boardId);
         // boardId 작성자 Id와 로그인 유저의 Id가 다를 경우 예외처리
-        if (!isSameUserId(loginUserId, board.getUser().getId())) {
+        if (isNotSameUserId(loginUserId, board.getUser().getId())) {
             throw new InvalidBoardException(BoardErrorCode.BOARD_FORBIDDEN);
         }
 
@@ -101,8 +101,8 @@ public class BoardExternalService {
 
     // 헬퍼메서드
     // LoginUser와 Board를 작성한 User가 같은지 검증
-    public boolean isSameUserId(Long loginUserId, Long boardUserId) {
-        return loginUserId.equals(boardUserId);
+    public boolean isNotSameUserId(Long loginUserId, Long boardUserId) {
+        return !loginUserId.equals(boardUserId);
     }
 
     // boardId가 존재하지만 삭제됐을 경우 예외처리
