@@ -1,7 +1,6 @@
 package com.spartaboys.newsfeed.access.repository;
 
-import com.spartaboys.newsfeed.access.User;
-import jakarta.persistence.Id;
+import com.spartaboys.newsfeed.domain.users.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

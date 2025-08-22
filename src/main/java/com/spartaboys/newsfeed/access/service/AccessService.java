@@ -2,8 +2,8 @@ package com.spartaboys.newsfeed.access.service;
 
 import com.spartaboys.newsfeed.access.Dto.*;
 import com.spartaboys.newsfeed.access.JwtTokenUtil;
-import com.spartaboys.newsfeed.access.User;
 import com.spartaboys.newsfeed.access.repository.UserRepositorySample;
+import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class LoginUserServiceSample {
         user.setPassword(request.getPassword());
         userRepositorySample.save(user);
 
-        return new UserSignUpResponse(user.getLoginId(), request.getUsername(), user.getEmail());
+        return new UserSignUpResponse(user.getEmail(), request.getUsername(), user.getEmail());
     }
 
     @Transactional(readOnly = true)
@@ -54,11 +54,11 @@ public class LoginUserServiceSample {
 
         User user = getLoginUserByLoginId(loginRequest.getLoginId());
 
-        String token = JwtTokenUtil.createToken(user.getLoginId(),
+        String token = JwtTokenUtil.createToken(user.getEmail(),
         "super-secret-key-change-me-32bytes-minimum-aaaaaaaaaaaa",
                 15 * 60 * 1000L);
 
-        return new LoginResponse(user.getLoginId(), token);
+        return new LoginResponse(user.getEmail(), token);
     }
 
     @Transactional
