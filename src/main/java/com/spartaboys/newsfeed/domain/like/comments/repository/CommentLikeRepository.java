@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.comments.repository;
 
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
+import com.spartaboys.newsfeed.domain.like.entity.BoardLike;
 import com.spartaboys.newsfeed.domain.like.entity.CommentLike;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.entity;
 
 import com.spartaboys.newsfeed.domain.comments.entity.Comment;
+import com.spartaboys.newsfeed.domain.like.dto.ContentType;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,4 +29,16 @@ public class CommentLike extends Like {
                 .comment(comment)
                 .build();
     }
+
+    @Override
+    public ContentType getContentType() {
+        return ContentType.COMMENT;
+    }
+
+    @Override
+    public Long getContentId() {
+        return this.comment.getId();
+    }
+
+
 }

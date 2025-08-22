@@ -1,5 +1,6 @@
 package com.spartaboys.newsfeed.domain.like.entity;
 
+import com.spartaboys.newsfeed.domain.like.dto.ContentType;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -39,4 +40,7 @@ public abstract class Like {
     public boolean isOwnerBy(User user) {
         return ObjectUtils.nullSafeEquals(this.user, user);
     }
+
+    public abstract ContentType getContentType();
+    public abstract Long getContentId();
 }

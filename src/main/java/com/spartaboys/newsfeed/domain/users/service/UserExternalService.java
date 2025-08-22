@@ -12,10 +12,18 @@ import com.spartaboys.newsfeed.domain.follow.dto.FollowingResponse;
 import com.spartaboys.newsfeed.domain.follow.entity.Follow;
 import com.spartaboys.newsfeed.domain.follow.mapper.FollowMapper;
 import com.spartaboys.newsfeed.domain.follow.service.internal.FollowInternalService;
+import com.spartaboys.newsfeed.domain.like.board.service.internal.BoardLikeInternalService;
+import com.spartaboys.newsfeed.domain.like.comments.service.internal.CommentLikeInternalService;
+import com.spartaboys.newsfeed.domain.like.dto.LikeResponse;
+import com.spartaboys.newsfeed.domain.like.entity.BoardLike;
+import com.spartaboys.newsfeed.domain.like.entity.CommentLike;
+import com.spartaboys.newsfeed.domain.like.entity.Like;
+import com.spartaboys.newsfeed.domain.like.mapper.LikeMapper;
 import com.spartaboys.newsfeed.domain.users.dto.request.ChangePasswordRequest;
 import com.spartaboys.newsfeed.domain.users.dto.request.UserUpdateRequest;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPrivateResponse;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserUpdateResponse;
+import com.spartaboys.newsfeed.domain.users.enums.LikeType;
 import com.spartaboys.newsfeed.domain.users.mapper.UserMapper;
 import com.spartaboys.newsfeed.domain.users.dto.response.UserPublicResponse;
 import com.spartaboys.newsfeed.domain.users.entity.User;
@@ -28,9 +36,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +55,9 @@ public class UserExternalService {
     private final CommentMapper commentMapper;
     private final FollowInternalService followInternalService;
     private final FollowMapper followMapper;
+    private final BoardLikeInternalService boardLikeInternalService;
+    private final CommentLikeInternalService commentLikeInternalService;
+    private final LikeMapper likeMapper;
 
     // 헬퍼 메서드
     private User getUserOrThrow(Long id) {
@@ -144,5 +158,18 @@ public class UserExternalService {
 
     }
 
-    // public Page<>
+    // TODO : 추후 Page로 변경
+    // 컨텐츠 전체 반환
+    public List<LikeResponse> getLikesFromUserId(Long userId, String target) {
+        User targetUser = getUserOrThrow(userId);
+        LikeType likeType = LikeType.from(target);
+
+        return likeType.select(
+                        boardLikeInternalService.getBoardLikesByUserId(targetUser.getId()),
+                        commentLikeInternalService.getCommentLikesByUserId(targetUser.getId())
+                )
+                .sorted(Comparator.comparing(Like::getCreatedAt).reversed())
+                .map(likeMapper::toLikeResponse)
+                .toList();
+    }
 }
