@@ -10,6 +10,7 @@ import com.spartaboys.newsfeed.domain.comments.entity.Comment;
 import com.spartaboys.newsfeed.domain.comments.mapper.CommentMapper;
 import com.spartaboys.newsfeed.domain.comments.repository.CommentRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
+import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,16 +26,18 @@ import java.util.stream.Collectors;
 public class CommentExternalService {
 
     private final BoardInternalService boardInternalService;
+    private final UserInternalService userInternalService;
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
     // 댓글 생성
     @Transactional
-    public CommentResponse createComment(Long boardId, Long commentId, User loginUser, CommentCreateRequest request) {
+    public CommentResponse createComment(Long boardId, Long commentId, Long loginUserId, CommentCreateRequest request) {
 
-        // 게시글 찾아오기
+        // 게시글 및 유저 찾아오기
         Board findBoard = boardInternalService.getBoardById(boardId);
+        User loginUser = userInternalService.getUserObjectById(loginUserId);
 
         // 댓글 생성
         Comment comment;
@@ -92,13 +95,13 @@ public class CommentExternalService {
 
     // 댓글 수정
     @Transactional
-    public CommentResponse updateComment(Long boardId, Long commentId, User loginUser, CommentUpdateRequest request) {
+    public CommentResponse updateComment(Long boardId, Long commentId, Long loginUserId, CommentUpdateRequest request) {
 
         // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
         Comment findComment = checkComment(commentId, boardId);
 
         // 유저의 권한 확인
-        findComment.validateOwner(loginUser.getId());
+        findComment.validateOwner(loginUserId);
 
         // 댓글 내용 수정
         findComment.updateContent(request.content());
@@ -109,13 +112,13 @@ public class CommentExternalService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long boardId, Long commentId, User loginUser) {
+    public void deleteComment(Long boardId, Long commentId, Long loginUserId) {
 
         // 댓글 찾기 & 삭제 여부 & 게시글 ID 동일한지 검증
         Comment findComment = checkComment(commentId, boardId);
 
         // 유저의 권한 확인
-        findComment.validateOwner(loginUser.getId());
+        findComment.validateOwner(loginUserId);
 
         // 해당 댓글 삭제 ( isDelete = true, deletedAt = LocalDateTime.now() )
         findComment.delete();
