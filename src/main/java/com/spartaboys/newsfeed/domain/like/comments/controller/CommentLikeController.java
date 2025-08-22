@@ -1,7 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.comments.controller;
 
 import com.spartaboys.newsfeed.common.response.ApiResponse;
-import com.spartaboys.newsfeed.domain.like.comments.service.CommentLikeCommandService;
+import com.spartaboys.newsfeed.domain.like.comments.service.external.CommentLikeCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
