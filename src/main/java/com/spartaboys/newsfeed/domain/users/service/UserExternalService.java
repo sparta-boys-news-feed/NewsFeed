@@ -79,12 +79,12 @@ public class UserExternalService {
 
     @Transactional
     public UserUpdateResponse updateUserProfile(Long id, UserUpdateRequest dto) {
-        if (userRepository.existsByNickname(dto.getNickname())) {
+        if (userRepository.existsByNickname(dto.nickname())) {
             throw new InvalidUserException(UserErrorCode.USR_DUPLICATE_EMAIL);
         }
 
         User currentUser = getUserOrThrow(id);
-        currentUser.updateNickname(dto.getNickname());
+        currentUser.updateNickname(dto.nickname());
 
         return userMapper.toUpdateResponse(currentUser);
     }
