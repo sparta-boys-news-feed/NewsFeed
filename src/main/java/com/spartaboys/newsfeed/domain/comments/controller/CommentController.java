@@ -7,7 +7,6 @@ import com.spartaboys.newsfeed.domain.comments.dto.request.CommentUpdateRequest;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentGetAllResponse;
 import com.spartaboys.newsfeed.domain.comments.dto.response.CommentResponse;
 import com.spartaboys.newsfeed.domain.comments.service.CommentExternalService;
-import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,15 +23,15 @@ public class CommentController {
 
     private final CommentExternalService commentExternalService;
 
-    @PostMapping("/{commentId}")
+    @PostMapping({ "", "/{commentId}" })
     public ResponseEntity<ApiResponse<CommentResponse>> createComment(
             @PathVariable Long boardId,
-            @PathVariable Long commentId,
-            @SessionAttribute("user") User loginUser,
+            @PathVariable(required = false) Long commentId,
+            @SessionAttribute("LOGIN_USER_ID") Long loginUserId,
             @Valid @RequestBody CommentCreateRequest commentRequest
     ) {
 
-        CommentResponse response = commentExternalService.createComment(boardId, commentId, loginUser, commentRequest);
+        CommentResponse response = commentExternalService.createComment(boardId, commentId, loginUserId, commentRequest);
 
         return ApiResponse.created(response);
     }
@@ -63,11 +62,11 @@ public class CommentController {
     public ResponseEntity<ApiResponse<CommentResponse>> updateComment(
             @PathVariable Long boardId,
             @PathVariable Long commentId,
-            @SessionAttribute("user") User loginUser,
+            @SessionAttribute("LOGIN_USER_ID") Long loginUserId,
             @Valid @RequestBody CommentUpdateRequest commentRequest
     ) {
 
-        CommentResponse response = commentExternalService.updateComment(boardId, commentId, loginUser, commentRequest);
+        CommentResponse response = commentExternalService.updateComment(boardId, commentId, loginUserId, commentRequest);
 
         return ApiResponse.success(response);
     }
@@ -76,8 +75,8 @@ public class CommentController {
     public void deleteComment(
             @PathVariable Long boardId,
             @PathVariable Long commentId,
-            @SessionAttribute("user") User loginUser
+            @SessionAttribute("LOGIN_USER_ID") Long loginUserId
     ) {
-        commentExternalService.deleteComment(boardId, commentId, loginUser);
+        commentExternalService.deleteComment(boardId, commentId, loginUserId);
     }
 }
