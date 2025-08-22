@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.access;
 
-import com.spartaboys.newsfeed.access.service.LoginUserServiceSample;
+import com.spartaboys.newsfeed.access.service.AccessService;
+import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final LoginUserServiceSample loginUserServiceSample;
+    private final AccessService accessService;
     private final String secretKey;
 
     @Override
@@ -48,19 +49,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         // 전송받은 값에서 'Bearer' 뒷부분(Jwt Token) 추출
         String token = authorizationHeader.substring(7);
 
-        //전송받은 Jwt Token이 만료되었으면 -> 다음 필터 진행( 인증 x )
-        if (JwtTokenUtil.isExpired(token, secretKey)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+        //전송받은 Jwt Token이 만료되었으면 -> 다음 필터 진행( 인증 x )g
         try {
             if (JwtTokenUtil.isExpired(token, secretKey)) {
                 filterChain.doFilter(request, response);
                 return;
             }
             String loginId = JwtTokenUtil.getLoginId(token, secretKey);
-            User loginUser = loginUserServiceSample.getLoginUserByLoginId(loginId);
+            User loginUser = accessService.getLoginUserByLoginId(loginId);
             if (loginUser == null) {
                 filterChain.doFilter(request, response);
                 return;
@@ -74,7 +70,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String loginId = JwtTokenUtil.getLoginId(token, secretKey);
 
         // 추출한 LoginiId로 User 찾아오기
-        User loginUser = loginUserServiceSample.getLoginUserByLoginId(loginId);
+        User loginUser = accessService.getLoginUserByLoginId(loginId);
 
 
 

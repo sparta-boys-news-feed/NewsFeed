@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepositorySample extends JpaRepository<User,Long> {
+public interface AccessRepository extends JpaRepository<User,Long> {
 
-    Optional<User> findByLoginId(String loginId);
+    Optional<User> findByEmail(String email);
 
-    boolean existsByLoginId(String loginId);
+    boolean existsByEmail(String email);
 
     void deleteById(Long id);
 

@@ -1,5 +1,7 @@
 package com.spartaboys.newsfeed.access.Dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserSignUpResponse {
 
-    String loginId;
     String userName;
     String email;
 
+    public UserSignUpResponse(@Email @NotBlank String email, @NotBlank(message = "회원 이름은 필수 입력값입니다.") String username, @Email @NotBlank String email1) {
+
+    }
 }

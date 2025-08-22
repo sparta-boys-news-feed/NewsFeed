@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class LoginController {
+public class AccessController {
 
     private final AccessService accessService;
 
@@ -68,7 +68,8 @@ public class LoginController {
     }
 
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<Void> deleteUser(HttpServletRequest request){
+    public ResponseEntity<Void> deleteUser(HttpServletRequest request,
+                                           @RequestBody DeleteRequestUser deleteRequestUser){
 
         HttpSession session = request.getSession(false);
         if (session == null) return ResponseEntity.status(401).build();
@@ -76,7 +77,7 @@ public class LoginController {
         Long id = (Long) session.getAttribute("LOGIN_USER_ID");
         if (id == null) return ResponseEntity.status(401).build();
 
-        accessService.deleteUserByid(id);
+        accessService.deleteUserByPassword(deleteRequestUser);
 
         session.invalidate();
         return ResponseEntity.noContent().build();

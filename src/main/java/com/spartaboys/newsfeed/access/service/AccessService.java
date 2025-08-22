@@ -2,7 +2,8 @@ package com.spartaboys.newsfeed.access.service;
 
 import com.spartaboys.newsfeed.access.Dto.*;
 import com.spartaboys.newsfeed.access.JwtTokenUtil;
-import com.spartaboys.newsfeed.access.repository.UserRepositorySample;
+import com.spartaboys.newsfeed.access.PasswordEncoder;
+import com.spartaboys.newsfeed.access.repository.AccessRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -11,40 +12,45 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
-public class LoginUserServiceSample {
+public class AccessService {
 
-    private final UserRepositorySample userRepositorySample;
+    private final AccessRepository accessRepository;
+    private final PasswordEncoder passwordEncoder;
 
     //loginId로 엔티티를 호출 없을시에는 예외 처리
     @Transactional(readOnly = true)
-    public User findByLoginId(String loginId) {
+    public User findByLoginId(String email) {
 
-        return userRepositorySample.findByLoginId(loginId)
+        return accessRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 
     // LoginId를 통해서 유저찾기
     @Transactional(readOnly = true)
-    public User getLoginUserByLoginId(String loginId) {
+    public User getLoginUserByLoginId(String email) {
 
-        return userRepositorySample.findByLoginId(loginId)
+        return accessRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그인 아이디입니다."));
     }
 
     @Transactional
     public UserSignUpResponse SignUp(UserSignUpRequest request){
 
-        if (userRepositorySample.existsByLoginId(request.getLoginId())){
+        if (accessRepository.existsByEmail(request.getEmail())){
             throw new DuplicateKeyException("이미 사용 중인 로그인 아이디입니다.");
         }
 
-        User user = new User();
-        user.setLoginId(request.getLoginId());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        userRepositorySample.save(user);
+
+        String hashed = passwordEncoder.encode(8,request.getPassword());
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(hashed)
+                .build();
 
         return new UserSignUpResponse(user.getEmail(), request.getUsername(), user.getEmail());
     }
@@ -52,18 +58,28 @@ public class LoginUserServiceSample {
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest loginRequest) {
 
-        User user = getLoginUserByLoginId(loginRequest.getLoginId());
+        User user = getLoginUserByLoginId(loginRequest.getEmail());
 
         String token = JwtTokenUtil.createToken(user.getEmail(),
         "super-secret-key-change-me-32bytes-minimum-aaaaaaaaaaaa",
                 15 * 60 * 1000L);
 
+
         return new LoginResponse(user.getEmail(), token);
     }
 
     @Transactional
-    public void deleteUserByid(Long id) {
-        userRepositorySample.deleteById(id);
+    public void deleteUserByPassword(DeleteRequestUser deleteRequestUser) {
+        Optional<User> user = Optional.ofNullable(accessRepository.findByEmail(deleteRequestUser.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException()));
+
+        System.out.println("회원탈퇴를 위해서 비밀번호를 다시 입력해주세요.");
+        if (!passwordEncoder.matches(deleteRequestUser.getPassword(), user.get().getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 맞지 않습니다.");
+        }
+
+
+        accessRepository.deleteById(user.get().getId());
     }
 
     @Transactional
