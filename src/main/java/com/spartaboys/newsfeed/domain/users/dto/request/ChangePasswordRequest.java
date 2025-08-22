@@ -1,20 +1,24 @@
 package com.spartaboys.newsfeed.domain.users.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Pattern;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ChangePasswordRequest {
+public record ChangePasswordRequest (
     @NotBlank
-    private String currentPassword;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    String currentPassword,
 
     @NotBlank
-    private String newPassword;
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.")
+    String newPassword,
 
     @NotBlank
-    private String newPasswordConfirm;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    String newPasswordConfirm
+) {
+    @Override
+    public String toString() {
+        return "ChangePasswordRequest{***masked***}";
+    }
 }

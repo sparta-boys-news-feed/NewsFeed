@@ -91,16 +91,16 @@ public class UserExternalService {
 
     @Transactional
     public void updateUserPassword(Long id, ChangePasswordRequest dto) {
-        if (dto.getNewPasswordConfirm().equals(dto.getNewPassword())) {
+        if (!dto.newPassword().equals(dto.newPasswordConfirm())) {
             throw new InvalidUserException(UserErrorCode.USR_PW_CHECK_MISMATCH);
         }
 
         User currentUser = getUserOrThrow(id);
-        if (!passwordEncoder.matches(dto.getNewPassword(), currentUser.getPassword())) {
+        if (!passwordEncoder.matches(dto.currentPassword(), currentUser.getPassword())) {
             throw new InvalidUserException(UserErrorCode.USR_PW_CURRENT_MISMATCH);
         }
 
-        currentUser.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
+        currentUser.updatePassword(passwordEncoder.encode(dto.newPassword()));
     }
 
     public Page<BoardResponse> getBoardsByUserId(Pageable pageable, Long userId) {
