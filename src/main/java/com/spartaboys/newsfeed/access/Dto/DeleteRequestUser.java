@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteUser {
 
-    private String loginId;
+    private String email;
     private String password;
 
 }
