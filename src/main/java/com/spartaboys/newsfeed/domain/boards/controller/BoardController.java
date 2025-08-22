@@ -23,8 +23,8 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<BoardResponse>> getBoardByUserId(@Validated @RequestBody BoardRequest request,
-                                                                       @SessionAttribute(value = "USER") User loginUser) {
-        return ApiResponse.created(boardExternalService.getBoardByUserId(request, loginUser));
+                                                                       @SessionAttribute(value = "LOGIN_USER_ID") Long loginUserId) {
+        return ApiResponse.created(boardExternalService.getBoardByUserId(request, loginUserId));
     }
 
     @GetMapping
@@ -56,15 +56,15 @@ public class BoardController {
 
     @PatchMapping("/{boardId}")
     public ResponseEntity<ApiResponse<BoardResponse>> updateBoardDetailsByBoardId(@PathVariable Long boardId,
-                                                                                  @SessionAttribute(value = "USER") User loginUser,
+                                                                                  @SessionAttribute(value = "LOGIN_USER_ID") Long loginUserId,
                                                                                   @Validated @RequestBody BoardRequest request) {
         return ApiResponse.success(boardExternalService.updateBoardDetailsByBoardId(boardId, loginUser, request));
     }
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<ApiResponse<Object>> deleteBoardByBoardId(@PathVariable Long boardId,
-                                                                    @SessionAttribute(value = "USER") User loginUser) {
-        boardExternalService.deleteBoardByBoardId(boardId, loginUser);
+                                                                    @SessionAttribute(value = "LOGIN_USER_ID") Long loginUserId) {
+        boardExternalService.deleteBoardByBoardId(boardId, loginUserId);
 
         return ApiResponse.noContent();
     }
