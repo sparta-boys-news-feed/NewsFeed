@@ -1,4 +1,4 @@
-package com.spartaboys.newsfeed.domain.like.board.service;
+package com.spartaboys.newsfeed.domain.like.board.service.external;
 
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.boards.service.BoardInternalService;
