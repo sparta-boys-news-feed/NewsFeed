@@ -39,7 +39,7 @@ public class BoardExternalService {
     public Page<BoardResponse> getAllBoards(Pageable pageable) {
 
         // pageable 조건을 기준으로 모든 게시글 조회
-        Page<Board> boards = boardRepository.findAll(pageable);
+        Page<Board> boards = boardRepository.findAllByDeletedIsFalse(pageable);
 
         return boards.map(boardMapper::toDto);
     }
@@ -56,14 +56,14 @@ public class BoardExternalService {
         // content만 있을 경우 content로 조회
         if (title != null && content == null) {
             // 게시글 제목을 기준으로 페이징 조회
-            Page<Board> boards = boardRepository.findAllByTitle(title, pageable);
+            Page<Board> boards = boardRepository.findAllByTitleAndDeletedIsFalse(title, pageable);
 
             return boards.map(boardMapper::toDto);
         }
         // title만 있을 경우 title로 조회
         else if (title == null && content != null) {
             // 게시글 내용을 기준으로 페이징 조회
-            Page<Board> boards = boardRepository.findAllByContent(content, pageable);
+            Page<Board> boards = boardRepository.findAllByContentAndDeletedIsFalse(content, pageable);
 
             return boards.map(boardMapper::toDto);
         }
