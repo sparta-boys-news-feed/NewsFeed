@@ -6,7 +6,6 @@ import com.spartaboys.newsfeed.domain.boards.exception.BoardErrorCode;
 import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
-import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,6 @@ public class BoardInternalService {
 
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
-    private final UserInternalService userInternalService;
 
     // UserId로 유저의 모든 게시글 조회
     public Page<BoardResponse> getBoardsByUserId(Pageable pageable,
