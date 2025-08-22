@@ -26,6 +26,8 @@ public class AccessService {
     public User findByLoginId(String email) {
 
         return accessRepository.findByEmail(email)
+
+
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 
@@ -45,12 +47,15 @@ public class AccessService {
         }
 
 
-        String hashed = passwordEncoder.encode(8,request.getPassword());
+        String hashed = passwordEncoder.encode(request.getPassword());
 
         User user = User.builder()
                 .email(request.getEmail())
+                .nickname(request.getUsername())
                 .password(hashed)
                 .build();
+
+        User saved = accessRepository.save(user);
 
         return new UserSignUpResponse(user.getEmail(), request.getUsername(), user.getEmail());
     }
