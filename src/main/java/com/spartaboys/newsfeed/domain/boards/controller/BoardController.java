@@ -58,7 +58,7 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardResponse>> updateBoardDetailsByBoardId(@PathVariable Long boardId,
                                                                                   @SessionAttribute(value = "LOGIN_USER_ID") Long loginUserId,
                                                                                   @Validated @RequestBody BoardRequest request) {
-        return ApiResponse.success(boardExternalService.updateBoardDetailsByBoardId(boardId, loginUser, request));
+        return ApiResponse.success(boardExternalService.updateBoardDetailsByBoardId(boardId, loginUserId, request));
     }
 
     @DeleteMapping("/{boardId}")
