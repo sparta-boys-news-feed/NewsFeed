@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserSignUpResponse {
 
     String userName;
     String email;
 
-    public UserSignUpResponse(@Email @NotBlank String email, @NotBlank(message = "회원 이름은 필수 입력값입니다.") String username, @Email @NotBlank String email1) {
-
+    public UserSignUpResponse(String email, String userName) {
+        this.email = email;
+        this.userName = userName;
     }
 }
