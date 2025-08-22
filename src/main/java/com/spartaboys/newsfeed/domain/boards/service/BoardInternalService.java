@@ -25,7 +25,7 @@ public class BoardInternalService {
                                                  Long userId){
 
         // pageable 조건을 기준으로 특정 user의 모든 게시글 조회
-        Page<Board> boards = boardRepository.findAllByUserIdAndDeletedAtFalse(pageable, userId);
+        Page<Board> boards = boardRepository.findAllByUserIdAndDeletedIsFalse(pageable, userId);
 
         return boards.map(boardMapper::toDto);
     }
