@@ -6,7 +6,6 @@ import com.spartaboys.newsfeed.domain.boards.dto.request.BoardRequest;
 import com.spartaboys.newsfeed.domain.boards.dto.response.BoardResponse;
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
 import com.spartaboys.newsfeed.domain.boards.service.BoardExternalService;
-import com.spartaboys.newsfeed.domain.users.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,7 @@ public class BoardController {
 
     @GetMapping
     public ResponseEntity<ApiPageResponse<BoardResponse>> getAllBoards(@RequestParam(required = false, defaultValue = "0") int page,
-                                                                 @RequestParam(required = false, defaultValue = "10") int size) {
+                                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         // Pageable 객체 생성(현재 정책상 Client는 page, size, Service는 sort를 담당하고 있으나 추후 확장성을 고려하여 컨트롤에서 생성)
         // 생성일 기준 내림차순으로 정렬
         Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());

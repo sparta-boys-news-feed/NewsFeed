@@ -40,7 +40,8 @@ public class BoardInternalService {
 
         return boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
     }
-    
+
+    // 헬퍼 메서드
     // BoardId 유효성 검증
     public boolean isBoardValid(Long boardId){
         return boardRepository.existsByIdAndDeletedIsFalse(boardId);
