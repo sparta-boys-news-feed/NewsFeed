@@ -40,7 +40,7 @@ public class FollowInternalService {
      */
     public List<Follow> getFollowersByUserId(Long userId) {
         User user = userInternalService.getUserObjectById(userId);
-        return followRepository.findAllByFollower(user);
+        return followRepository.findAllByFollowee(user);
     }
 
     /**
@@ -51,7 +51,7 @@ public class FollowInternalService {
      */
     public Page<Follow> getFollowersByUserId(Long userId, Pageable pageable) {
         User user = userInternalService.getUserObjectById(userId);
-        return followRepository.findAllByFollower(user, pageable);
+        return followRepository.findAllByFollowee(user, pageable);
     }
 
     /**
@@ -62,7 +62,7 @@ public class FollowInternalService {
      */
     public List<Follow> getFolloweesByUserId(Long userId) {
         User user = userInternalService.getUserObjectById(userId);
-        return followRepository.findAllByFollowee(user);
+        return followRepository.findAllByFollower(user);
     }
 
     /**
@@ -73,6 +73,6 @@ public class FollowInternalService {
      */
     public Page<Follow> getFolloweesByUserId(Long userId, Pageable pageable) {
         User user = userInternalService.getUserObjectById(userId);
-        return followRepository.findAllByFollowee(user, pageable);
+        return followRepository.findAllByFollower(user, pageable);
     }
 }
