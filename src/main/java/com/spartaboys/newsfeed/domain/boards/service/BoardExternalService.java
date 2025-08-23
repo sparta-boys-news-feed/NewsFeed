@@ -8,12 +8,10 @@ import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
 import com.spartaboys.newsfeed.domain.follow.entity.Follow;
-import com.spartaboys.newsfeed.domain.follow.service.external.FollowQueryService;
 import com.spartaboys.newsfeed.domain.follow.service.internal.FollowInternalService;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -54,11 +51,8 @@ public class BoardExternalService {
 
     public Page<BoardResponse> getAllFolloweesBoards(Pageable pageable, Long loginUserId) {
 
-        // TODO 테스트 목표: 1번 유저가 게시글을 생성하고 2번 유저가 1번을 팔로우하고 게시글을 조회한다.
-        // 현재 로그인한 유저가 팔로우한 유저를 리스트 타입으로 선언
-        // TODO 예상 결과: 2번 유저가 조회할 경우 아무것도 나오지 않아야한다.[나를 팔로우 한 유저 목록]
+        // 현재 로그인한 사용자가 팔로우하고 있는 유저 목록 조회
         List<Follow> followees = followInternalService.getFolloweesByUserId(loginUserId);
-        log.info(followees.toString());
 
         List<Long> followeeIds = followees.stream().map(Follow::getId).toList();
 
