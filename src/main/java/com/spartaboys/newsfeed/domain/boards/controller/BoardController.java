@@ -36,6 +36,17 @@ public class BoardController {
         return ApiPageResponse.success(boardExternalService.getAllBoards(pageable));
     }
 
+    @GetMapping("/followees")
+    public ResponseEntity<ApiPageResponse<BoardResponse>> getAllFolloweesBoards(@RequestParam(required = false, defaultValue = "0") int page,
+                                                                                @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                @SessionAttribute(value = "LOGIN_USER_ID") Long loginUserId) {
+        // Pageable 객체 생성(현재 정책상 Client는 page, size, Service는 sort를 담당하고 있으나 추후 확장성을 고려하여 컨트롤에서 생성)
+        // 생성일 기준 내림차순으로 정렬
+        Pageable pageable = PageRequest.of(page, size, Sort.sort(Board.class).by(Board::getCreatedAt).descending());
+
+        return ApiPageResponse.success(boardExternalService.getAllFolloweesBoards(pageable, loginUserId));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<ApiPageResponse<BoardResponse>> getBoardsByTitleOrContent(@RequestParam(required = false, defaultValue = "0") int page,
                                                                                     @RequestParam(required = false, defaultValue = "10") int size,
