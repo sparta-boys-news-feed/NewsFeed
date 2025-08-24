@@ -15,7 +15,7 @@ public class BoardLikeController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> likeBoard(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PathVariable Long boardId
     ) {
         boardLikeCommandService.likeBoard(loginId, boardId);
@@ -24,7 +24,7 @@ public class BoardLikeController {
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> unlikeBoard(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PathVariable Long boardId
     ) {
         boardLikeCommandService.unlikeBoard(loginId, boardId);

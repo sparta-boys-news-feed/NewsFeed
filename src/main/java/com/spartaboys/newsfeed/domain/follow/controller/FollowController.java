@@ -23,7 +23,7 @@ public class FollowController {
 
     @PostMapping("/following/{followeeId}")
     public ResponseEntity<ApiResponse<Void>> followUser(
-            @SessionAttribute(name = "login_id") Long followerId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long followerId,
             @PathVariable Long followeeId
     ) {
         followCommandService.followUser(followerId, followeeId);
@@ -32,7 +32,7 @@ public class FollowController {
 
     @DeleteMapping("/following/{followeeId}")
     public ResponseEntity<ApiResponse<Void>> unFollowUser(
-            @SessionAttribute(name = "login_id") Long followerId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long followerId,
             @PathVariable Long followeeId
     ) {
         followCommandService.unFollowUser(followerId, followeeId);
@@ -42,7 +42,7 @@ public class FollowController {
 
     @GetMapping("/following")
     public ResponseEntity<ApiPageResponse<FollowingResponse>> getFollowings(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
         Page<FollowingResponse> followingResponses = followQueryService.getFollowings(loginId, pageable);
@@ -52,7 +52,7 @@ public class FollowController {
 
     @GetMapping("/followers")
     public ResponseEntity<ApiPageResponse<FollowerResponse>> getFollowers(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
         Page<FollowerResponse> followerResponses = followQueryService.getFollowers(loginId, pageable);
@@ -61,7 +61,7 @@ public class FollowController {
 
     @DeleteMapping("/followers/{followerId}")
     public ResponseEntity<ApiResponse<Void>> removeFollower(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PathVariable Long followerId
     ) {
         followCommandService.removeFollower(loginId, followerId);
