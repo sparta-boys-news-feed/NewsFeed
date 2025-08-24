@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     Optional<Follow> findByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
 
     @Modifying
-    @Query("delete from Follow f where f.follower.id = :follower and f.followee.id = :folloeweeId")
+    @Query("delete from Follow f where f.follower.id = :followerId and f.followee.id = :followeeId")
     void deleteByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
 
     Page<Follow> findAllByFollower(User user, Pageable pageable);
