@@ -7,6 +7,8 @@ import com.spartaboys.newsfeed.domain.boards.exception.BoardErrorCode;
 import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
+import com.spartaboys.newsfeed.domain.follow.entity.Follow;
+import com.spartaboys.newsfeed.domain.follow.service.internal.FollowInternalService;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
@@ -15,20 +17,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardExternalService {
 
-    private final BoardRepository boardRepository;
+    // 의존성
+    // Mapper
     private final BoardMapper boardMapper;
+
+    // Repository
+    private final BoardRepository boardRepository;
+
+    // InternalService
     private final UserInternalService userInternalService;
+    private final FollowInternalService followInternalService;
 
 
     @Transactional
-    public BoardResponse getBoardByUserId(BoardRequest request,
-                                          Long loginUserID) {
-        User user = userInternalService.getUserObjectById(loginUserID);
+    public BoardResponse createBoardByUserId(BoardRequest request,
+                                             Long loginUserId) {
+        User user = userInternalService.getUserObjectById(loginUserId);
 
         // DB에 게시글 저장
         Board board = boardRepository.save(boardMapper.toEntity(request, user));
@@ -40,6 +51,18 @@ public class BoardExternalService {
 
         // pageable 조건을 기준으로 모든 게시글 조회
         Page<Board> boards = boardRepository.findAllByDeletedIsFalse(pageable);
+
+        return boards.map(boardMapper::toDto);
+    }
+
+    public Page<BoardResponse> getAllFolloweesBoards(Pageable pageable, Long loginUserId) {
+
+        // 현재 로그인한 사용자가 팔로우하고 있는 유저 목록 조회
+        List<Follow> followees = followInternalService.getFolloweesByUserId(loginUserId);
+
+        List<Long> followeeIds = followees.stream().map(Follow::getId).toList();
+
+        Page<Board> boards = boardRepository.findAllByUserIdInAndDeletedIsFalse(followeeIds, pageable);
 
         return boards.map(boardMapper::toDto);
     }
