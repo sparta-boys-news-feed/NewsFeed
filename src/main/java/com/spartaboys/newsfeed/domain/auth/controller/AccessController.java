@@ -30,30 +30,19 @@ public class AccessController {
 
         LoginResponse response = accessService.login(loginRequest);
 
-        //로그인 아이디를 받아서 회원 정보 조회 -> 없을시 예외처리
         User user = accessService.findByLoginId(loginRequest.getEmail());
 
-        // 로그인 아이디나 비밀번호가 틀린 경우 -> 예외처리
         if (user == null) {
             return ResponseEntity.status(401).body(Map.of("message","로그인 아이디 또는 비밀번호가 틀렸습니다"));
         }
 
-        //비밀번호 검증
-
-        //JWT 토큰 생성
-
-        // 서명 과 완료를 JWTToken에 부여
         String accessToken = JwtTokenUtil.createToken(user.getEmail(), JWT_SECRET, ACCESS_EXP_MS);
         long expireTimesMs = 1000 * 60 * 60; // 토큰 유효 시간
 
-        // String token = JwtTokenUtil.createToken(user.getLoginId(), accessToken , expireTimesMs);
-
-        //세션에 저장
         HttpSession session = request.getSession(true);
         session.setAttribute("LOGIN_USER_ID", user.getId());
         session.setAttribute("LOGIN_ID", user.getEmail());
 
-        // Map 그대로 반환 Json
         return ResponseEntity.ok(Map.of(
                 "tokenType","Bearer",
                 "accessToken", response.getToken(),
