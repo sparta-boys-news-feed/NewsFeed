@@ -15,6 +15,7 @@ public class UserSignUpResponse {
     String email;
 
     public UserSignUpResponse(@Email @NotBlank String email, @NotBlank(message = "회원 이름은 필수 입력값입니다.") String username, @Email @NotBlank String email1) {
-
+        this.userName = username;
+        this.email = email;
     }
 }
