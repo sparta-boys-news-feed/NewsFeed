@@ -75,7 +75,7 @@ public class BoardExternalService {
     }
 
     public Page<BoardResponse> getBoardsByTitleOrContent(Pageable pageable, String title, String content) {
-        // TODO: 리팩토링이 필요할 것으로 사료
+
         // content만 있을 경우 content로 조회
         if (title != null && content == null) {
             // 게시글 제목을 기준으로 페이징 조회
@@ -91,7 +91,9 @@ public class BoardExternalService {
             return boards.map(boardMapper::toDto);
         }
         // title과 content가 모두 있거나 모두 없는 경우 예외처리
-        else throw new InvalidBoardException(BoardErrorCode.BOARD_INVALID_SEARCH_NOT_ALLOWED);
+        else {
+            throw new InvalidBoardException(BoardErrorCode.BOARD_INVALID_SEARCH_NOT_ALLOWED);
+        }
     }
 
     @Transactional
