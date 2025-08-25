@@ -1,8 +1,9 @@
 package com.spartaboys.newsfeed.domain.auth.service;
 
-import com.spartaboys.newsfeed.domain.auth.dto.*;
+import com.spartaboys.newsfeed.domain.auth.JWTConstant;
 import com.spartaboys.newsfeed.domain.auth.JwtTokenUtil;
 import com.spartaboys.newsfeed.domain.auth.PasswordEncoder;
+import com.spartaboys.newsfeed.domain.auth.dto.*;
 import com.spartaboys.newsfeed.domain.auth.repository.AccessRepository;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,20 +24,9 @@ public class AccessService {
 
     //loginId로 엔티티를 호출 없을시에는 예외 처리
     @Transactional(readOnly = true)
-    public User findByLoginId(String email) {
+    public User findByEmail(String email) {
 
-        return accessRepository.findByEmail(email)
-
-
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-    }
-
-    // LoginId를 통해서 유저찾기
-    @Transactional(readOnly = true)
-    public User getLoginUserByLoginId(String email) {
-
-        return accessRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그인 아이디입니다."));
+        return accessRepository.findByEmail(email);
     }
 
     @Transactional
@@ -57,32 +47,37 @@ public class AccessService {
 
         User saved = accessRepository.save(user);
 
-        return new UserSignUpResponse(user.getEmail(), request.getUsername(), user.getEmail());
+        return new UserSignUpResponse(user.getEmail(), request.getUsername());
     }
 
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest loginRequest) {
 
-        User user = getLoginUserByLoginId(loginRequest.getEmail());
+        User byEmail = accessRepository.findByEmail(loginRequest.getEmail());
 
-        String token = JwtTokenUtil.createToken(user.getEmail(),
-                "super-secret-key-change-me-32bytes-minimum-aaaaaaaaaaaa",
-                15 * 60 * 1000L);
+        if (byEmail == null){
+            throw new IllegalArgumentException("아이디가 맞지 않습니다.");
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(),byEmail.getPassword())){
+            throw new IllegalArgumentException("비밀번호가 맞지 않습니다.");
+        }
+
+        String token = JwtTokenUtil.createToken(byEmail.getEmail(),
+                JWTConstant.JWT_SECRET,
+               JWTConstant.ACCESS_EXP_MS);
 
 
-        return new LoginResponse(user.getEmail(), token);
+        return new LoginResponse(byEmail.getEmail(), token);
     }
 
     @Transactional
     public void deleteUserByPassword(DeleteRequestUser deleteRequestUser) {
-        Optional<User> user = Optional.ofNullable(accessRepository.findByEmail(deleteRequestUser.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException()));
+        Optional<User> user = Optional.ofNullable(accessRepository.findByEmail(deleteRequestUser.getEmail()));
 
-        System.out.println("회원탈퇴를 위해서 비밀번호를 다시 입력해주세요.");
         if (!passwordEncoder.matches(deleteRequestUser.getPassword(), user.get().getPassword())) {
             throw new IllegalArgumentException("비밀번호가 맞지 않습니다.");
         }
-
 
         accessRepository.deleteById(user.get().getId());
     }
