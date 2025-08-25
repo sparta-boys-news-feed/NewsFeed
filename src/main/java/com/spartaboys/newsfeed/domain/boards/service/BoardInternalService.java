@@ -6,7 +6,6 @@ import com.spartaboys.newsfeed.domain.boards.exception.BoardErrorCode;
 import com.spartaboys.newsfeed.domain.boards.exception.InvalidBoardException;
 import com.spartaboys.newsfeed.domain.boards.mapper.BoardMapper;
 import com.spartaboys.newsfeed.domain.boards.repository.BoardRepository;
-import com.spartaboys.newsfeed.domain.users.service.UserInternalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +19,13 @@ public class BoardInternalService {
 
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
-    private final UserInternalService userInternalService;
 
     // UserId로 유저의 모든 게시글 조회
     public Page<BoardResponse> getBoardsByUserId(Pageable pageable,
                                                  Long userId){
 
         // pageable 조건을 기준으로 특정 user의 모든 게시글 조회
-        Page<Board> boards = boardRepository.findAllByUserIdAndDeletedAtFalse(pageable, userId);
+        Page<Board> boards = boardRepository.findAllByUserIdAndDeletedIsFalse(pageable, userId);
 
         return boards.map(boardMapper::toDto);
     }
@@ -35,14 +33,19 @@ public class BoardInternalService {
     // BoardId로 board 단건 조회
     public Board getBoardById(Long boardId){
 
-        // BoardId 유효성 검증
-        isBoardValid(boardId);
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
-        return boardRepository.findById(boardId).orElseThrow(() -> new InvalidBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        // BoardId 유효성 검증
+        if(isBoardNotValid(boardId)){
+            throw new InvalidBoardException(BoardErrorCode.BOARD_ALREADY_DELETED);
+        }
+
+        return board;
     }
-    
+
+    // 헬퍼 메서드
     // BoardId 유효성 검증
-    public boolean isBoardValid(Long boardId){
-        return boardRepository.existsByIdAndDeletedIsFalse(boardId);
+    public boolean isBoardNotValid(Long boardId){
+        return !boardRepository.existsByIdAndDeletedIsFalse(boardId);
     }
 }

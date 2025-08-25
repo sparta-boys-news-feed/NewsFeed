@@ -1,6 +1,7 @@
 package com.spartaboys.newsfeed.domain.like.entity;
 
 import com.spartaboys.newsfeed.domain.boards.entity.Board;
+import com.spartaboys.newsfeed.domain.like.dto.ContentType;
 import com.spartaboys.newsfeed.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,4 +30,13 @@ public class BoardLike extends Like {
                 .build();
     }
 
+    @Override
+    public ContentType getContentType() {
+        return ContentType.BOARD;
+    }
+
+    @Override
+    public Long getContentId() {
+        return this.board.getId();
+    }
 }

@@ -15,7 +15,7 @@ public class CommentLikeController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> likeComment(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PathVariable Long boardId,
             @PathVariable Long commentId
     ) {
@@ -25,7 +25,7 @@ public class CommentLikeController {
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> unlikeComment(
-            @SessionAttribute(name = "login_id") Long loginId,
+            @SessionAttribute(name = "LOGIN_USER_ID") Long loginId,
             @PathVariable Long boardId,
             @PathVariable Long commentId
     ) {

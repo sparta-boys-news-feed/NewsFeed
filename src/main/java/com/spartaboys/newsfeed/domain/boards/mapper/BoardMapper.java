@@ -15,23 +15,24 @@ public class BoardMapper {
     public Board toEntity(BoardRequest request, User user) {
         return Board.builder()
                 .title(request.title())
-                .user(user)
                 .content(request.content())
+                .user(user)
                 .build();
     }
 
     // 게시글 CRUD에서 Board Entity -> BoardRequest Dto 변한
     public BoardResponse toDto(Board board) {
         return BoardResponse.builder()
-                .Id(board.getId())
-                .likes(board.getLikes())
-                .deletedAt(board.getDeletedAt())
+                .id(board.getId())
                 .userId(board.getUser().getId())
+                .nickname(board.getUser().getNickname())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .likes(board.getLikes())
                 .createdAt(board.getCreatedAt())
                 .updatedAt(board.getUpdatedAt())
-                .content(board.getContent())
+                .deletedAt(board.getDeletedAt())
                 .isDeleted(board.isDeleted())
-                .title(board.getTitle())
                 .build();
     }
 }
