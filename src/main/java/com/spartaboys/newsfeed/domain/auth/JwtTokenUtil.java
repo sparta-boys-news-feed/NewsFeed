@@ -10,13 +10,13 @@ import java.util.Date;
 // Jwt 활용할 기능들 정리  토큰 생성.
 public class JwtTokenUtil {
 
-    public static String createToken(String loginId, String key, long expireTimeMs){
+    public static String createToken(String nickName, String key, long expireTimeMs){
 
         // Claim = Jwt Token에 들어갈 정보
         Date now = new Date();
         Claims claims = Jwts.claims();
-        claims.put("loginId", loginId);
-        claims.setSubject(loginId);
+        claims.put("nickName", nickName);
+        claims.setSubject(nickName);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -28,6 +28,7 @@ public class JwtTokenUtil {
 
     // Claims에서 loginId 꺼내기
     public static String getLoginId(String token, String secretKey){
+
         return extractClaims(token, secretKey).get("loginId", String.class);
     }
 
@@ -45,4 +46,5 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }

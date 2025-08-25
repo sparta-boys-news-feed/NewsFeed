@@ -15,4 +15,6 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-
+jwt:
+ secret: THIS_IS_AT_LEAST_32_BYTES_LONG_SECRET_1234_5678
+ clock-skew-seconds: 60

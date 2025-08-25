@@ -29,11 +29,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        //header 값이 비었을 때
-        if (authorizationHeader == null) {
-            filterChain.doFilter(request, response); // dofilter를 사용해서 예외처리
-            return;
-        }
+//        //header 값이 비었을 때
+//        if (authorizationHeader == null) {
+//            filterChain.doFilter(request, response); // dofilter를 사용해서 예외처리
+//            return;
+//        }
 
         //header의 Authorization 값이 'Bearer ' 로 시작하지 않을때
         if (!authorizationHeader.startsWith("Bearer")) {
@@ -55,8 +55,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            String loginId = JwtTokenUtil.getLoginId(token, secretKey);
-            User loginUser = accessService.getLoginUserByLoginId(loginId);
+            String email = JwtTokenUtil.getLoginId(token, secretKey);
+            User loginUser = accessService.findByEmail(email);
             if (loginUser == null) {
                 filterChain.doFilter(request, response);
                 return;
@@ -66,17 +66,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Jwt Token에서 loginId 추출
-        String loginId = JwtTokenUtil.getLoginId(token, secretKey);
+        // Jwt Token에서 email 추출
+        String email = JwtTokenUtil.getLoginId(token, secretKey);
 
-        // 추출한 LoginiId로 User 찾아오기
-        User loginUser = accessService.getLoginUserByLoginId(loginId);
-
-
-
-        //loginUser 정보로 UsernamePasswordAuthenticationToken 발급
-
+        // 추출한 email로 User 찾아오기
+        User loginUser = accessService.findByEmail(email);
 
     }
-
 }
